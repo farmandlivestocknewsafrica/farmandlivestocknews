@@ -14,17 +14,18 @@ import {
   ChevronLeft,
   ChevronRight,
   Shield,
-  History
+  History,
+  Download
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
-
 const navItems = [
   { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/admin/articles', icon: FileText, label: 'Articles' },
   { href: '/admin/subscriptions', icon: Users, label: 'Subscribers' },
   { href: '/admin/ad-campaigns', icon: Megaphone, label: 'Ad Campaigns' },
   { href: '/admin/magazines', icon: BookOpen, label: 'Magazines' },
+  { href: '/admin/media-kits', icon: Download, label: 'Media Kits' },
   { href: '/admin/logs', icon: History, label: 'Audit Logs' },
   { href: '/admin/settings/account', icon: Settings, label: 'Settings' },
 ]
