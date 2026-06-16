@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useEffect, useState, useMemo } from 'react'
 import { usePathname } from 'next/navigation'
 import { AdSlot } from '@/components/ad-slot'
+import { SearchExperience } from '@/components/search/search-experience'
 
 interface Category {
   id: string

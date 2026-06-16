@@ -32,16 +32,8 @@ export function MediaKitDownloader() {
         return
       }
 
-      // Try to fetch the file first to check if it's accessible
-      console.log('[MediaKit] Checking file accessibility:', kit.file_url)
-      const fileRes = await fetch(kit.file_url, { method: 'HEAD' })
-      if (!fileRes.ok) {
-        console.error('[MediaKit] File not accessible:', fileRes.status)
-        alert('Media kit file is not accessible. Please contact support.')
-        return
-      }
-
-      // Create hidden anchor element and trigger download
+      // Create hidden anchor element and trigger download directly
+      // (no HEAD request to avoid CORS issues with external URLs)
       const link = document.createElement('a')
       link.href = kit.file_url
       link.download = `${kit.title || 'media-kit'}.${kit.file_type || 'pdf'}`
