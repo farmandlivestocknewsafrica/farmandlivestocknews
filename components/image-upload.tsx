@@ -22,10 +22,10 @@ export function ImageUpload({
   value,
   onChange,
   label = 'Upload Image',
-  accept = 'image/jpeg,image/jpg,image/png,image/webp',
+  accept = 'image/jpeg,image/jpg,image/png,image/webp,image/gif',
   maxSizeMB = 5,
   helpText,
-  allowGif = false
+  allowGif = true
 }: ImageUploadProps) {
   const isPdf = accept.includes('application/pdf')
   const isAdUpload = bucket === 'ads'
@@ -42,15 +42,14 @@ export function ImageUpload({
   const inputRef = useRef<HTMLInputElement>(null)
 
   const validateFile = (file: File): string | null => {
-    if (isAdUpload) {
-      if (!ALLOWED_AD_FORMATS.mimeTypes.includes(file.type)) {
-        return `Invalid file type. Allowed formats: ${ALLOWED_AD_FORMATS.display}`
+    // 1. Check file type
+    const allowedTypes = (isAdUpload ? ALLOWED_AD_FORMATS.mimeTypes : accept.split(',').map(t => t.trim()))
+    
+    if (!allowedTypes.includes(file.type)) {
+      if (file.type === 'image/gif' && !allowGif && !isAdUpload) {
+        return 'GIF files are not allowed for this upload.'
       }
-    } else {
-      const allowedTypes = accept.split(',').map(t => t.trim())
-      if (!allowedTypes.includes(file.type)) {
-        return `Invalid file type. Allowed: ${allowedTypes.map(t => t.split('/')[1]).join(', ')}`
-      }
+      return `Invalid file type. Allowed: ${allowedTypes.map(t => t.split('/')[1]).join(', ')}`
     }
     
     const maxSize = isAdUpload ? strictMaxSizeMB : maxSizeMB
@@ -261,7 +260,7 @@ export function ImageUpload({
       <input
         ref={inputRef}
         type="file"
-        accept={accept}
+        accept={isAdUpload ? ALLOWED_AD_FORMATS.mimeTypes.join(',') : accept}
         onChange={handleFileChange}
         className="hidden"
         aria-label={label}

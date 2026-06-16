@@ -111,6 +111,8 @@ export function AdSlot({ slug, width, height, className = '' }: AdSlotProps) {
     return () => observer.disconnect()
   }, [ad, slug])
 
+  const [failed, setFailed] = useState(false)
+
   if (loading) {
     return (
       <div
@@ -122,7 +124,7 @@ export function AdSlot({ slug, width, height, className = '' }: AdSlotProps) {
   }
 
   // Empty state: render nothing (no layout breaking, no error UI for visitors)
-  if (!ad) {
+  if (!ad || failed) {
     return null
   }
 
@@ -163,6 +165,11 @@ export function AdSlot({ slug, width, height, className = '' }: AdSlotProps) {
         className="object-contain"
         sizes={`(max-width: 768px) 100vw, ${adWidth}px`}
         priority={false}
+        unoptimized
+        onError={() => {
+          console.error(`[v0] Ad failed to load: ${ad.image_url}`)
+          setFailed(true)
+        }}
       />
     </button>
   )

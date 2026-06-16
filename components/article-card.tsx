@@ -47,6 +47,7 @@ export function ArticleCard({
                 width={192}
                 height={128}
                 className="w-full h-full object-cover group-hover:scale-105 transition"
+                unoptimized
               />
             </div>
           )}
@@ -76,6 +77,7 @@ export function ArticleCard({
               alt={title}
               fill
               className="object-cover group-hover:scale-105 transition"
+              unoptimized
             />
           </div>
         )}
