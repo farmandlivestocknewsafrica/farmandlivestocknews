@@ -60,7 +60,7 @@ export function AdSlot({ slug, width, height, className = '' }: AdSlotProps) {
     const fetchAd = async () => {
       const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
       const url = `${baseUrl}/api/ads/slots/${slug}`
-      console.log(`[AdSlot] Fetching ad for slot: ${slug} at ${url}`)
+      console.log(`[AdSlot] Fetching ad for slot: ${slug}`)
       try {
         const response = await fetch(url, {
           headers: { 'x-session-id': getSessionId() },
@@ -75,10 +75,9 @@ export function AdSlot({ slug, width, height, className = '' }: AdSlotProps) {
           setFailed(false)
         }
       } catch (err: any) {
+        if (err.name === 'AbortError') return
         console.error(`[v0] Error fetching ad for slot "${slug}":`, {
           message: err.message,
-          stack: err.stack,
-          name: err.name,
           slug
         })
         if (!cancelled && retryCount < maxRetries) {

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { validateSlotSlug, SLOT_CONFIG, type AdSlotType } from '@/lib/ads/constants'
 import { isCampaignActive, normalizeWeight, selectByWeight } from '@/lib/ads/utils'
 import type { AdForSlot } from '@/lib/types/ads'
@@ -61,7 +61,9 @@ export function invalidateAdCache(slotSlug?: string) {
  * Fetch all valid candidates for a slot from the database.
  */
 async function fetchCandidates(slotSlug: AdSlotType): Promise<ResolvedCandidate[]> {
-  const supabase = await createClient()
+  // Use admin client for ad delivery to ensure bypass of RLS issues 
+  // and consistent delivery for public visitors.
+  const supabase = await createAdminClient()
 
   console.log(`[AdResolver] Fetching candidates for slot: ${slotSlug}`)
 
@@ -72,7 +74,7 @@ async function fetchCandidates(slotSlug: AdSlotType): Promise<ResolvedCandidate[
       campaign_id,
       weight,
       is_active,
-      ad_campaigns (
+      ad_campaigns!campaign_id (
         id,
         title,
         image_url,
@@ -92,6 +94,10 @@ async function fetchCandidates(slotSlug: AdSlotType): Promise<ResolvedCandidate[
     return []
   }
 
+  if (placements && placements.length > 0) {
+    // console.log(`[AdResolver] Raw placements for ${slotSlug}:`, JSON.stringify(placements, null, 2))
+  }
+
   if (!placements || placements.length === 0) {
     console.log(`[AdResolver] No active placements found for slot: ${slotSlug}`)
     return []
@@ -104,7 +110,7 @@ async function fetchCandidates(slotSlug: AdSlotType): Promise<ResolvedCandidate[
   for (const placement of placements) {
     const campaign = placement.ad_campaigns as any
     if (!campaign) {
-      console.log(`[AdResolver] Placement ${placement.id} has no associated campaign.`)
+      // console.log(`[AdResolver] Placement ${placement.id} for ${slotSlug} has no associated campaign. placement.campaign_id: ${placement.campaign_id}`)
       continue
     }
     
