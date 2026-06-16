@@ -46,9 +46,14 @@ export default async function Home() {
   return (
     <SiteShell>
       <div className="w-full">
-        {/* Home Page Leaderboard - below nav, above content */}
+        {/* Home Page Leaderboard Primary - below nav, above content */}
         <div className="home-page-leaderboard w-full flex justify-center py-6 mb-4">
           <AdSlot slug="HOME_LEADERBOARD_PRIMARY" />
+        </div>
+
+        {/* Home Page Leaderboard Secondary - below primary */}
+        <div className="w-full flex justify-center py-4 mb-4">
+          <AdSlot slug="HOME_LEADERBOARD_SECONDARY" />
         </div>
 
         {/* Content stream */}
@@ -57,6 +62,11 @@ export default async function Home() {
         {/* Bottom Leaderboard - before footer */}
         <div className="w-full py-4 flex justify-center">
           <AdSlot slug="BOTTOM_LEADERBOARD" />
+        </div>
+
+        {/* Bottom Rotator - below bottom leaderboard */}
+        <div className="w-full py-4 flex justify-center">
+          <AdSlot slug="BOTTOM_ROTATOR" />
         </div>
       </div>
 

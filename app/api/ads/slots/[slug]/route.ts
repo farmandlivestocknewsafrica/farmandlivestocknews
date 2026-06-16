@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { validateSlotSlug } from '@/lib/ads/constants'
+import { validateSlotSlug, SLOT_CONFIG } from '@/lib/ads/constants'
 import { resolveAd } from '@/lib/ads/resolver'
 
 /**
@@ -24,13 +24,18 @@ export async function GET(
 
     const ad = await resolveAd(slug)
 
+    // Use shorter cache for rotating slots to allow proper rotation
+    const config = SLOT_CONFIG[slug]
+    const cacheControl = config?.rotating 
+      ? 'public, max-age=5, stale-while-revalidate=5' 
+      : 'public, max-age=30, stale-while-revalidate=30'
+
     return NextResponse.json(
       { ad },
       {
         status: 200,
         headers: {
-          // Short CDN/browser cache aligned with resolver TTL
-          'Cache-Control': 'public, max-age=30, stale-while-revalidate=30',
+          'Cache-Control': cacheControl,
         },
       }
     )

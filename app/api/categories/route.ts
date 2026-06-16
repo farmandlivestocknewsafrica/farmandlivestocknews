@@ -6,7 +6,7 @@ const NAVIGATION_CATEGORIES = [
   {
     id: 'agribusiness',
     name: 'Agribusiness',
-    slug: 'agribusiness',
+    slug: 'agribusiness-investment',
     key: 'agribusiness'
   },
   {
@@ -24,19 +24,19 @@ const NAVIGATION_CATEGORIES = [
   {
     id: 'technology_innovation',
     name: 'Technology & Innovation',
-    slug: 'technology-innovation',
+    slug: 'agritech-innovation',
     key: 'technology_innovation'
   },
   {
     id: 'equipment_mechanisation',
-    name: 'Equipment & Mechanisation',
-    slug: 'equipment-mechanisation',
+    name: 'Equipment & Mechanization',
+    slug: 'equipment-mechanization',
     key: 'equipment_mechanisation'
   },
   {
     id: 'nutrition',
     name: 'Nutrition',
-    slug: 'nutrition',
+    slug: 'inputs-nutrition',
     key: 'nutrition'
   }
 ]

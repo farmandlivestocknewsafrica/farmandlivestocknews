@@ -43,13 +43,17 @@ export function ImageUpload({
 
   const validateFile = (file: File): string | null => {
     // 1. Check file type
-    const allowedTypes = (isAdUpload ? ALLOWED_AD_FORMATS.mimeTypes : accept.split(',').map(t => t.trim()))
+    const allowedTypes = isAdUpload 
+      ? [...ALLOWED_AD_FORMATS.mimeTypes] 
+      : accept.split(',').map(t => t.trim())
     
     if (!allowedTypes.includes(file.type)) {
-      if (file.type === 'image/gif' && !allowGif && !isAdUpload) {
-        return 'GIF files are not allowed for this upload.'
-      }
       return `Invalid file type. Allowed: ${allowedTypes.map(t => t.split('/')[1]).join(', ')}`
+    }
+    
+    // GIF check - only block if explicitly not allowed and not an ad upload
+    if (file.type === 'image/gif' && !allowGif && !isAdUpload) {
+      return 'GIF files are not allowed for this upload.'
     }
     
     const maxSize = isAdUpload ? strictMaxSizeMB : maxSizeMB
