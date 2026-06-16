@@ -65,13 +65,13 @@ export function ArticleCard({
   }
 
   return (
-    <Link href={`/articles/${slug}`}>
+    <Link href={`/articles/${slug}`} className="block h-full">
       <div 
-        className="group overflow-hidden rounded-lg bg-card border border-border hover:shadow-lg transition animate-fade-in-up"
+        className="group overflow-hidden rounded-lg bg-card border border-border hover:shadow-lg transition animate-fade-in-up h-full flex flex-col"
         style={{ animationDelay: `${animationDelay * 100}ms` }}
       >
         {featured_image_url && (
-          <div className="relative w-full h-64 bg-muted overflow-hidden">
+          <div className="relative w-full h-48 bg-muted overflow-hidden flex-shrink-0">
             <Image
               src={featured_image_url}
               alt={title}

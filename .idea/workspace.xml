@@ -6,9 +6,32 @@
   <component name="ChangeListManager">
     <list default="true" id="7528826e-c203-48db-a148-0f064d646cf0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.output.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/admin/admin-sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/admin/admin-sidebar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/next-env.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/next-env.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/[category]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/[category]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/agribusiness-investment/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/agribusiness-investment/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/agritech-innovation/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/agritech-innovation/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/admin/ad-slots/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/admin/ad-slots/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/ads/slots/[slug]/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/ads/slots/[slug]/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/articles/[slug]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/articles/[slug]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/category/[slug]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/category/[slug]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/crop-production/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/crop-production/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/equipment-mechanization/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/equipment-mechanization/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/globals.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/inputs-nutrition/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/inputs-nutrition/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/livestock-farming/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/livestock-farming/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/policy-regulations/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/policy-regulations/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/veterinary-protection/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/veterinary-protection/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ad-slot.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ad-slot.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/admin/ad-campaign-manager.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/admin/ad-campaign-manager.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/article-card.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/article-card.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/feed-layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/feed-layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/footer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/footer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/home-page-client.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/home-page-client.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/ads/constants.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/ads/constants.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/ads/resolver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/ads/resolver.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/ads/utils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/ads/utils.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,7 +39,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="225" />
+    <option name="cachedIndexableFilesCount" value="234" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="Git.Settings">
@@ -25,6 +48,65 @@
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.000072002123691" />
+      <entry key="MS500" value="1.3481839215881406" />
+      <entry key="S2" value="3.9047744793252406" />
+      <entry key="S5" value="5.855473674108215" />
+      <entry key="S10" value="6.8157496878097295" />
+      <entry key="S30" value="7.577007028666595" />
+      <entry key="S60" value="7.784738296914307" />
+      <entry key="M2" value="7.891409191989885" />
+      <entry key="M5" value="7.956330854042019" />
+      <entry key="M10" value="7.9781264185241225" />
+      <entry key="M15" value="7.985408928561565" />
+      <entry key="M30" value="7.992700118571884" />
+      <entry key="H1" value="7.996348972142777" />
+      <entry key="H2" value="7.99817421419605" />
+      <entry key="H4" value="7.9990870391179945" />
+      <entry key="D1" value="7.999847830410379" />
+      <entry key="W1" value="7.999978261255936" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="0.0" />
+      <entry key="S30" value="0.0" />
+      <entry key="S60" value="0.0" />
+      <entry key="M2" value="0.0" />
+      <entry key="M5" value="0.0" />
+      <entry key="M10" value="0.0" />
+      <entry key="M15" value="0.0" />
+      <entry key="M30" value="0.0" />
+      <entry key="H1" value="0.0" />
+      <entry key="H2" value="0.0" />
+      <entry key="H4" value="0.0" />
+      <entry key="D1" value="0.0" />
+      <entry key="W1" value="0.0" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="1.2557233381388743E-4" />
+      <entry key="MS500" value="0.48284213439161255" />
+      <entry key="S2" value="3.49264698861976" />
+      <entry key="S5" value="5.657386155236604" />
+      <entry key="S10" value="6.7095257437375" />
+      <entry key="S30" value="7.539792078561633" />
+      <entry key="S60" value="7.765889746893237" />
+      <entry key="M2" value="7.881923422810854" />
+      <entry key="M5" value="7.952521627103116" />
+      <entry key="M10" value="7.976219304958821" />
+      <entry key="M15" value="7.984136962931521" />
+      <entry key="M30" value="7.992063857210626" />
+      <entry key="H1" value="7.996030771778102" />
+      <entry key="H2" value="7.998015096586761" />
+      <entry key="H4" value="7.999007475955868" />
+      <entry key="D1" value="7.999834569278089" />
+      <entry key="W1" value="7.999976366793641" />
+    </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3,
@@ -35,29 +117,31 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "main",
-    "js.debugger.nextJs.config.created.client": "true",
-    "js.debugger.nextJs.config.created.server": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "pnpm",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;js.debugger.nextJs.config.created.client&quot;: &quot;true&quot;,
+    &quot;js.debugger.nextJs.config.created.server&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/TERRA/Desktop/Muhali/farm-livestock-news Final&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;pnpm&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\TERRA\\Desktop\\Muhali\\farm-livestock-news Final\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="npm.Next.js: server-side">
     <configuration name="Next.js: debug client-side" type="JavascriptDebugType" uri="http://localhost:3000/">
       <method v="2" />
@@ -88,7 +172,9 @@
       <option name="presentableId" value="Default" />
       <updated>1781514287233</updated>
       <workItem from="1781514296496" duration="11948000" />
-      <workItem from="1781529111240" duration="1401000" />
+      <workItem from="1781529111240" duration="3786000" />
+      <workItem from="1781596022962" duration="1863000" />
+      <workItem from="1781603758637" duration="3816000" />
     </task>
     <servers />
   </component>

@@ -39,8 +39,9 @@ export function Header() {
       {/* Main Header */}
       <header className="bg-background border-b border-gray-medium">
         <div className="max-w-7xl mx-auto px-4 py-6">
-          {/* Logo Section */}
-          <div className="flex items-center justify-between gap-8 mb-4">
+          {/* Logo + Top Page Leaderboard row */}
+          <div className="flex items-center justify-between gap-6">
+            {/* Logo */}
             <Link href="/" className="flex items-center gap-4 flex-shrink-0">
               <Image 
                 src="/logo.png" 
@@ -56,11 +57,19 @@ export function Header() {
               </div>
             </Link>
 
-            {/* Right Side: Ad Slot 1 and Search */}
-            <div className="flex items-center gap-6 flex-shrink-0">
-              {/* TOP LEADERBOARD BANNER (1) - Hidden on mobile */}
-              <div className="hidden lg:block">
-                <AdSlot slug="TOP_LEADERBOARD" width={728} height={90} />
+            {/* Right Side: Top Page Leaderboard + Search */}
+            <div className="flex items-center gap-4 flex-grow justify-end">
+              {/* TOP PAGE LEADERBOARD - right of logo, above nav
+                   Supports both the new TOP_PAGE_LEADERBOARD slot and the
+                   existing TOP_HEADER_AD slot for backward compatibility.
+                   AdSlot gracefully returns null when no campaign matches. */}
+              <div className="top-page-leaderboard hidden md:flex items-center gap-4 flex-grow max-w-[728px] h-[90px]">
+                <AdSlot slug="TOP_PAGE_LEADERBOARD" width={728} height={90} />
+                <AdSlot slug="TOP_HEADER_AD" width={728} height={90} />
+              </div>
+              <div className="block md:hidden flex-grow h-[50px]">
+                <AdSlot slug="TOP_PAGE_LEADERBOARD" width={320} height={50} />
+                <AdSlot slug="TOP_HEADER_AD" width={320} height={50} />
               </div>
 
               {/* Search */}

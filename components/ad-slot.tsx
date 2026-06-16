@@ -39,6 +39,7 @@ function getSessionId(): string {
 export function AdSlot({ slug, width, height, className = '' }: AdSlotProps) {
   const [ad, setAd] = useState<AdForSlot | null>(null)
   const [loading, setLoading] = useState(true)
+  const [failed, setFailed] = useState(false)
 
   const fetchAttempted = useRef(false)
   const impressionSent = useRef(false)
@@ -48,40 +49,72 @@ export function AdSlot({ slug, width, height, className = '' }: AdSlotProps) {
   const config = validateSlotSlug(slug) ? SLOT_CONFIG[slug] : null
   const adWidth = width ?? config?.defaultWidth ?? 300
   const adHeight = height ?? config?.defaultHeight ?? 250
+  const isRotating = config?.rotating ?? false
 
-  // Fetch resolved ad
+  // Fetch resolved ad with retry for dev mode resilience
   useEffect(() => {
-    if (fetchAttempted.current) return
-    fetchAttempted.current = true
-
-    if (!validateSlotSlug(slug)) {
-      console.error(`[v0] Invalid ad slot: "${slug}"`)
-      setLoading(false)
-      return
-    }
+    let cancelled = false
+    let retryCount = 0
+    const maxRetries = 2
 
     const fetchAd = async () => {
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
+      const url = `${baseUrl}/api/ads/slots/${slug}`
+      console.log(`[AdSlot] Fetching ad for slot: ${slug} at ${url}`)
       try {
-        const response = await fetch(`/api/ads/slots/${slug}`, {
+        const response = await fetch(url, {
           headers: { 'x-session-id': getSessionId() },
+          cache: 'no-store'
         })
+        console.log(`[AdSlot] Response status for ${slug}: ${response.status}`)
         if (!response.ok) throw new Error(response.statusText)
         const data = await response.json()
-        setAd(data.ad || null)
-      } catch (err) {
-        console.error(`[v0] Error fetching ad for slot "${slug}":`, err)
-        setAd(null)
+        console.log(`[AdSlot] Data for ${slug}:`, data)
+        if (!cancelled) {
+          setAd(data.ad || null)
+          setFailed(false)
+        }
+      } catch (err: any) {
+        console.error(`[v0] Error fetching ad for slot "${slug}":`, {
+          message: err.message,
+          stack: err.stack,
+          name: err.name,
+          slug
+        })
+        if (!cancelled && retryCount < maxRetries) {
+          retryCount++
+          setTimeout(fetchAd, 1000 * retryCount)
+        } else if (!cancelled) {
+          setAd(prev => prev || null)
+        }
       } finally {
-        setLoading(false)
+        if (!cancelled) {
+          setLoading(false)
+        }
       }
     }
 
     fetchAd()
-  }, [slug])
+
+    // Setup rotation interval if enabled
+    let interval: NodeJS.Timeout | null = null
+    if (isRotating) {
+      interval = setInterval(fetchAd, 15000)
+    }
+
+    return () => {
+      cancelled = true
+      if (interval) clearInterval(interval)
+    }
+  }, [slug, isRotating])
 
   // Viewport-based impression tracking
   useEffect(() => {
-    if (!ad || impressionSent.current) return
+    if (!ad) return
+    
+    // Reset impression tracking for new ads
+    impressionSent.current = false
+    
     const el = containerRef.current
     if (!el) return
 
@@ -111,8 +144,6 @@ export function AdSlot({ slug, width, height, className = '' }: AdSlotProps) {
     return () => observer.disconnect()
   }, [ad, slug])
 
-  const [failed, setFailed] = useState(false)
-
   if (loading) {
     return (
       <div
@@ -125,6 +156,14 @@ export function AdSlot({ slug, width, height, className = '' }: AdSlotProps) {
 
   // Empty state: render nothing (no layout breaking, no error UI for visitors)
   if (!ad || failed) {
+    if (typeof window !== 'undefined' && window.location.search.includes('debug_ads')) {
+      return (
+        <div className="border border-dashed border-red-500 p-2 text-[10px] text-red-500 overflow-hidden" style={{ width: adWidth, height: adHeight }}>
+          Slot: {slug}<br/>
+          Reason: {!ad ? 'No ad resolved' : 'Creative failed to load'}
+        </div>
+      )
+    }
     return null
   }
 

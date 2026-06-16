@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { validateSlotSlug, type AdSlotType } from '@/lib/ads/constants'
+import { validateSlotSlug, SLOT_CONFIG, type AdSlotType } from '@/lib/ads/constants'
 import { isCampaignActive, normalizeWeight, selectByWeight } from '@/lib/ads/utils'
 import type { AdForSlot } from '@/lib/types/ads'
 
@@ -15,9 +15,10 @@ import type { AdForSlot } from '@/lib/types/ads'
  * 5. If no candidates: returns null (frontend renders nothing/placeholder)
  *
  * Performance:
- * - In-memory TTL cache (45s) of candidate lists per slot
+ * - In-memory TTL cache of candidate lists per slot
+ *   - Rotating slots: 10s TTL for responsive rotation
+ *   - Static slots: 45s TTL for performance
  * - Weighted random is applied per-request on the cached candidate list
- *   so rotation still works while DB is only hit once per TTL window
  * - Cache invalidated on campaign/placement mutations via invalidateAdCache()
  */
 
@@ -38,7 +39,8 @@ interface CacheEntry {
   fetchedAt: number
 }
 
-const CACHE_TTL_MS = 45_000 // 45 seconds
+const STATIC_CACHE_TTL_MS = 45_000 // 45 seconds for non-rotating slots
+const ROTATING_CACHE_TTL_MS = 10_000 // 10 seconds for rotating slots (aligns with 15s client interval)
 
 // Module-level in-memory cache (per server instance)
 const slotCache = new Map<string, CacheEntry>()
@@ -60,6 +62,8 @@ export function invalidateAdCache(slotSlug?: string) {
  */
 async function fetchCandidates(slotSlug: AdSlotType): Promise<ResolvedCandidate[]> {
   const supabase = await createClient()
+
+  console.log(`[AdResolver] Fetching candidates for slot: ${slotSlug}`)
 
   const { data: placements, error } = await supabase
     .from('ad_placements')
@@ -84,20 +88,42 @@ async function fetchCandidates(slotSlug: AdSlotType): Promise<ResolvedCandidate[
     .eq('is_active', true)
 
   if (error) {
-    console.error('[v0] Resolver: error fetching placements:', error)
+    console.error(`[AdResolver] Error fetching placements for ${slotSlug}:`, error)
     return []
   }
 
-  if (!placements || placements.length === 0) return []
+  if (!placements || placements.length === 0) {
+    console.log(`[AdResolver] No active placements found for slot: ${slotSlug}`)
+    return []
+  }
+
+  console.log(`[AdResolver] Found ${placements.length} placements for ${slotSlug}. Evaluating campaigns...`)
 
   const candidates: ResolvedCandidate[] = []
 
   for (const placement of placements) {
     const campaign = placement.ad_campaigns as any
-    if (!campaign) continue
-    if (!campaign.is_active) continue
-    if (!isCampaignActive(campaign.start_date, campaign.end_date)) continue
-    if (!campaign.image_url) continue // never serve broken creatives
+    if (!campaign) {
+      console.log(`[AdResolver] Placement ${placement.id} has no associated campaign.`)
+      continue
+    }
+    
+    if (!campaign.is_active) {
+      console.log(`[AdResolver] Campaign "${campaign.title}" (${campaign.id}) is inactive.`)
+      continue
+    }
+
+    if (!isCampaignActive(campaign.start_date, campaign.end_date)) {
+      console.log(`[AdResolver] Campaign "${campaign.title}" is outside of date range: ${campaign.start_date} to ${campaign.end_date}`)
+      continue
+    }
+
+    if (!campaign.image_url) {
+      console.log(`[AdResolver] Campaign "${campaign.title}" has no image_url. Skipping.`)
+      continue // never serve broken creatives
+    }
+
+    console.log(`[AdResolver] Campaign "${campaign.title}" is ELIGIBLE.`)
 
     candidates.push({
       campaignId: campaign.id,
@@ -112,17 +138,23 @@ async function fetchCandidates(slotSlug: AdSlotType): Promise<ResolvedCandidate[
     })
   }
 
+  console.log(`[AdResolver] Total eligible candidates for ${slotSlug}: ${candidates.length}`)
   return candidates
 }
 
 /**
  * Get candidates for a slot, using TTL cache.
+ * Rotating slots use a shorter cache TTL for responsive rotation.
  */
 async function getCandidates(slotSlug: AdSlotType): Promise<ResolvedCandidate[]> {
   const cached = slotCache.get(slotSlug)
   const now = Date.now()
 
-  if (cached && now - cached.fetchedAt < CACHE_TTL_MS) {
+  // Use appropriate TTL based on slot rotation config
+  const config = SLOT_CONFIG[slotSlug]
+  const ttl = config?.rotating ? ROTATING_CACHE_TTL_MS : STATIC_CACHE_TTL_MS
+
+  if (cached && now - cached.fetchedAt < ttl) {
     return cached.candidates
   }
 
@@ -137,16 +169,24 @@ async function getCandidates(slotSlug: AdSlotType): Promise<ResolvedCandidate[]>
  */
 export function selectCandidate(candidates: ResolvedCandidate[]): ResolvedCandidate | null {
   if (!candidates || candidates.length === 0) return null
-  if (candidates.length === 1) return candidates[0]
+  if (candidates.length === 1) {
+    console.log(`[AdResolver] Automatically selected only candidate: "${candidates[0].title}"`)
+    return candidates[0]
+  }
 
   // Rule: highest priority wins
   const maxPriority = Math.max(...candidates.map(c => c.priority))
   const topTier = candidates.filter(c => c.priority === maxPriority)
 
-  if (topTier.length === 1) return topTier[0]
+  if (topTier.length === 1) {
+    console.log(`[AdResolver] Selected highest priority (${maxPriority}) candidate: "${topTier[0].title}"`)
+    return topTier[0]
+  }
 
   // Rule: tie -> weighted random
-  return selectByWeight(topTier)
+  const selected = selectByWeight(topTier)
+  console.log(`[AdResolver] Priority tie at ${maxPriority}. Weighted random selected: "${selected?.title}"`)
+  return selected
 }
 
 /**
@@ -195,6 +235,8 @@ export async function debugSlot(slotSlug: AdSlotType) {
   }
 
   const cached = slotCache.get(slotSlug)
+  const config = SLOT_CONFIG[slotSlug]
+  const ttl = config?.rotating ? ROTATING_CACHE_TTL_MS : STATIC_CACHE_TTL_MS
 
   return {
     slot: slotSlug,
@@ -212,7 +254,7 @@ export async function debugSlot(slotSlug: AdSlotType) {
       : null,
     reason,
     cache: cached
-      ? { ageMs: Date.now() - cached.fetchedAt, ttlMs: CACHE_TTL_MS }
-      : { ageMs: null, ttlMs: CACHE_TTL_MS },
+      ? { ageMs: Date.now() - cached.fetchedAt, ttlMs: ttl }
+      : { ageMs: null, ttlMs: ttl },
   }
 }

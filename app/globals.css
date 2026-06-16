@@ -219,6 +219,39 @@
   animation: scaleIn 0.6s ease-out forwards;
 }
 
+/* Ad banner responsive sizing */
+.top-page-leaderboard {
+  max-width: 970px;
+  min-height: 90px;
+}
+
+.top-page-leaderboard img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
+.home-page-leaderboard {
+  max-width: 970px;
+  min-height: 250px;
+}
+
+.home-page-leaderboard img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
+@media (max-width: 768px) {
+  .home-page-leaderboard {
+    min-height: 100px;
+  }
+}
+
 /* Stagger animations for lists */
 .animate-fade-in-up-1 {
   animation: fadeInUp 0.6s ease-out forwards 0.1s;

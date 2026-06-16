@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Lora, Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
 const lora = Lora({ subsets: ["latin"], variable: '--font-lora' })
@@ -38,6 +39,7 @@ export default async function RootLayout({
     <html lang="en" className={`${lora.variable} ${inter.variable}`}>
       <body className="font-sans antialiased bg-background text-foreground">
         {children}
+        <Toaster position="top-right" richColors />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

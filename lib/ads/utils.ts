@@ -61,7 +61,10 @@ export function isCampaignActive(
   if (isNaN(start.getTime())) return false
 
   // Campaign hasn't started yet
-  if (start > now) return false
+  if (start > now) {
+    console.log(`[isCampaignActive] Campaign not yet started: ${startDate} > ${now.toISOString()}`)
+    return false
+  }
 
   // No end date = indefinite (always active if started)
   if (!endDate) return true
@@ -70,7 +73,10 @@ export function isCampaignActive(
   if (isNaN(end.getTime())) return false
 
   // Campaign has expired
-  if (end < now) return false
+  if (end < now) {
+    console.log(`[isCampaignActive] Campaign expired: ${endDate} < ${now.toISOString()}`)
+    return false
+  }
 
   return true
 }

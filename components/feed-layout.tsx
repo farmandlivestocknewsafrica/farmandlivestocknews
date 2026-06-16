@@ -62,7 +62,7 @@ export function FeedLayout({
 }: FeedLayoutProps) {
   const isGrid = layout === 'grid'
   const gridClass = isGrid 
-    ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 auto-rows-max'
+    ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2'
     : 'flex flex-col'
 
   return (
@@ -75,7 +75,7 @@ export function FeedLayout({
         </div>
       )}
 
-      <div className={`${widthClasses[width]} mx-auto px-4`}>
+      <div className="mx-auto">
         <div className={`${gridClass} ${spacingClasses[spacing]}`}>
           {children}
         </div>

@@ -15,6 +15,7 @@ export async function GET(
 ) {
   try {
     const { slug } = await params
+    console.log(`[AdAPI] GET /api/ads/slots/${slug}`)
 
     if (!validateSlotSlug(slug)) {
       console.error(`[v0] Invalid ad slot requested: "${slug}"`)

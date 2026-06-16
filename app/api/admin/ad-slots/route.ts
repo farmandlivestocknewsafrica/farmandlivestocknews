@@ -19,9 +19,8 @@ export async function GET() {
     // Get active campaigns count
     const { data: activeCampaigns, error: campaignError, count: activeCampaignCount } = await supabase
       .from('ad_campaigns')
-      .select('id', { count: 'exact' })
+      .select('id', { count: 'exact', head: true })
       .eq('is_active', true)
-      .not('end_date', 'is', null)
 
     if (campaignError) {
       console.error('[v0] Error fetching active campaigns:', campaignError)

@@ -7,19 +7,30 @@ import { AD_SLOTS, ALLOWED_AD_FORMATS } from '@/lib/ads/constants'
 import { ImageUpload } from '@/components/image-upload'
 
 const SLOT_GROUPS = {
+  'Global (Site-wide)': [
+    'TOP_PAGE_LEADERBOARD',
+    'TOP_HEADER_AD',
+  ],
   'Homepage': [
-    'TOP_LEADERBOARD',
-    'HOME_TOP_ROTATING_1',
-    'HOME_TOP_ROTATING_2',
+    'HOME_LEADERBOARD_PRIMARY',
+    'HOME_LEADERBOARD_SECONDARY',
     'LEFT_SIDE_BANNER_1',
     'LEFT_SIDE_BANNER_2',
     'LEFT_SIDE_BANNER_3',
+    'LEFT_SIDE_BANNER_4',
+    'LEFT_SIDE_BANNER_5',
+    'LEFT_SIDE_BANNER_6',
+    'LEFT_SIDE_BANNER_7',
     'RIGHT_SIDE_BANNER_1',
     'RIGHT_SIDE_BANNER_2',
     'RIGHT_SIDE_BANNER_3',
+    'RIGHT_SIDE_BANNER_4',
+    'RIGHT_SIDE_BANNER_5',
+    'RIGHT_SIDE_BANNER_6',
+    'RIGHT_SIDE_BANNER_7',
     'IN_CONTENT_NATIVE',
     'BOTTOM_LEADERBOARD',
-    'BOTTOM_HOME_ROTATING'
+    'BOTTOM_ROTATOR'
   ],
   'Article Pages': ['ARTICLE_TOP', 'ARTICLE_MIDDLE', 'ARTICLE_BOTTOM'],
   'Mobile': ['MOBILE_HEADER', 'MOBILE_STICKY', 'MOBILE_INLINE'],
