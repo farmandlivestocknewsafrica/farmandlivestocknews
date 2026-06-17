@@ -9,17 +9,34 @@ interface CategoryPageProps {
   params: Promise<{ category: string }>
 }
 
-// Slug to category key mapping
+// Slug to category key mapping — single source of truth for routing
+// Maps URL slugs -> DB category enum values
 const SLUG_TO_KEY: Record<string, string> = {
+  // Agribusiness
+  'agribusiness-investment': 'agribusiness',
   'agribusiness': 'agribusiness',
+  // Crop Production
   'crop-production': 'crop_production',
-  'crops': 'crop_production', // Legacy support
+  'crops': 'crop_production',
+  // Livestock Farming
   'livestock-farming': 'livestock_farming',
-  'livestock': 'livestock_farming', // Legacy support
+  'livestock': 'livestock_farming',
+  // Technology & Innovation
+  'agritech-innovation': 'technology_innovation',
   'technology-innovation': 'technology_innovation',
-  'tech': 'technology_innovation', // Legacy support
+  'tech': 'technology_innovation',
+  // Equipment & Mechanization
+  'equipment-mechanization': 'equipment_mechanisation',
   'equipment-mechanisation': 'equipment_mechanisation',
-  'nutrition': 'nutrition'
+  // Inputs & Nutrition
+  'inputs-nutrition': 'nutrition',
+  'nutrition': 'nutrition',
+  // Policy & Regulations
+  'policy-regulations': 'policy_regulations',
+  'policy': 'policy_regulations',
+  // Veterinary & Protection
+  'veterinary-protection': 'veterinary_protection',
+  'veterinary': 'veterinary_protection',
 }
 
 // Key to display name mapping
@@ -28,8 +45,22 @@ const KEY_TO_NAME: Record<string, string> = {
   'crop_production': 'Crop Production',
   'livestock_farming': 'Livestock Farming',
   'technology_innovation': 'Technology & Innovation',
-  'equipment_mechanisation': 'Equipment & Mechanisation',
-  'nutrition': 'Nutrition'
+  'equipment_mechanisation': 'Equipment & Mechanization',
+  'nutrition': 'Nutrition',
+  'policy_regulations': 'Policy & Regulations',
+  'veterinary_protection': 'Veterinary & Protection',
+}
+
+// Key to description mapping for category page headers
+const KEY_TO_DESCRIPTION: Record<string, string> = {
+  'agribusiness': 'agribusiness and investment',
+  'crop_production': 'crop production',
+  'livestock_farming': 'livestock farming',
+  'technology_innovation': 'agritech and innovation',
+  'equipment_mechanisation': 'equipment and mechanization',
+  'nutrition': 'inputs and nutrition',
+  'policy_regulations': 'policy and regulations',
+  'veterinary_protection': 'veterinary and protection',
 }
 
 async function getCategoryData(categorySlug: string) {
@@ -47,11 +78,12 @@ async function getCategoryData(categorySlug: string) {
       .select('*')
       .eq('category', categoryKey)
       .order('published_at', { ascending: false })
-      .limit(12) // Load first 12 for initial page
+      .limit(12)
 
     return {
       categoryKey,
-      categoryName: KEY_TO_NAME[categoryKey],
+      categoryName: KEY_TO_NAME[categoryKey] || categoryKey,
+      description: KEY_TO_DESCRIPTION[categoryKey] || categoryKey.replace(/_/g, ' '),
       articles: articlesRes.data || []
     }
   } catch (error) {
@@ -68,35 +100,34 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     notFound()
   }
 
-  const { categoryKey, categoryName, articles } = data
+  const { categoryKey, categoryName, description, articles } = data
 
   return (
     <SiteShell>
-      <main className="flex-1 relative">
-        {/* HOME TOP ROTATING LEADERBOARD - below header */}
-        <div className="w-full py-3 flex justify-center px-4 bg-muted/20">
-          <AdPlacement slug="HOME_LEADERBOARD_PRIMARY" variant="leaderboard" />
-        </div>
+      {/* TOP LEADERBOARD */}
+      <div className="w-full py-3 flex justify-center bg-muted/20">
+        <AdPlacement slug="HOME_LEADERBOARD_PRIMARY" variant="leaderboard" />
+      </div>
 
-        <div className="w-full px-4 py-12">
-        {/* Header */}
-        <div className="mb-12">
+      <div className="py-8">
+        {/* Category Header */}
+        <div className="mb-10">
           <div className="flex items-center gap-2 mb-4">
             <div className="h-1 w-12 bg-primary"></div>
             <span className="text-sm font-semibold text-primary uppercase">Category</span>
           </div>
-          <h1 className="font-serif text-4xl md:text-5xl font-bold text-primary mb-4 text-balance">
+          <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold text-primary mb-4 text-balance">
             {categoryName} <span className="text-foreground">NEWS & INSIGHTS</span>
           </h1>
-          <p className="text-lg text-muted-foreground max-w-3xl">
-            Latest articles and insights about {categoryName.toLowerCase()} in Africa
+          <p className="text-base sm:text-lg text-muted-foreground max-w-3xl">
+            Latest articles and insights about {description} in Africa
           </p>
         </div>
 
-        {/* Featured Article */}
+        {/* Featured Article + Sidebar Info */}
         {articles.length > 0 && (
-          <div className="mb-12">
-            <div className="grid md:grid-cols-3 gap-6">
+          <div className="mb-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-2">
                 <ArticleCard
                   id={articles[0].id}
@@ -109,7 +140,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                   category={articles[0].category}
                 />
               </div>
-              <div className="bg-card border border-border rounded-lg p-6 h-fit">
+              <div className="bg-card border border-border rounded-lg p-5 sm:p-6 h-fit">
                 <h3 className="font-semibold text-primary mb-4">Category Info</h3>
                 <div className="space-y-2">
                   <p className="text-sm text-muted-foreground">
@@ -124,17 +155,15 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           </div>
         )}
 
-        {/* Infinite Scroll Articles */}
+        {/* All Articles - Infinite Scroll */}
         {articles.length > 0 ? (
-          <div className="flex gap-10 xl:gap-14 2xl:gap-20 items-start relative">
-            <div className="flex-1 min-w-0">
-              <h2 className="font-serif text-2xl font-bold text-primary mb-6">All Articles</h2>
-              <InfiniteArticles 
-                initialArticles={articles.slice(1)} 
-                category={categoryKey}
-                limit={12}
-              />
-            </div>
+          <div>
+            <h2 className="font-serif text-xl sm:text-2xl font-bold text-primary mb-6">All Articles</h2>
+            <InfiniteArticles 
+              initialArticles={articles.slice(1)} 
+              category={categoryKey}
+              limit={12}
+            />
           </div>
         ) : (
           <div className="text-center py-12">
@@ -143,23 +172,17 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         )}
       </div>
 
-        {/* IN-CONTENT NATIVE BANNER */}
-        <div className="w-full py-3 flex justify-center px-4">
-          <AdPlacement slug="IN_CONTENT_NATIVE" variant="native" />
-        </div>
-
-        {/* BOTTOM LEADERBOARD */}
-        <div className="w-full py-3 flex justify-center px-4">
-          <AdPlacement slug="BOTTOM_LEADERBOARD" variant="leaderboard" />
-        </div>
-
-        {/* BOTTOM ROTATING LEADERBOARD */}
-        <div className="w-full py-3 flex justify-center px-4">
-          <AdPlacement slug="BOTTOM_ROTATOR" variant="leaderboard" />
-        </div>
-
-        <MobileInlineAd />
-      </main>
+      {/* Bottom Ad Placements */}
+      <div className="w-full py-3 flex justify-center">
+        <AdPlacement slug="IN_CONTENT_NATIVE" variant="native" />
+      </div>
+      <div className="w-full py-3 flex justify-center">
+        <AdPlacement slug="BOTTOM_LEADERBOARD" variant="leaderboard" />
+      </div>
+      <div className="w-full py-3 flex justify-center">
+        <AdPlacement slug="BOTTOM_ROTATOR" variant="leaderboard" />
+      </div>
+      <MobileInlineAd />
     </SiteShell>
   )
 }

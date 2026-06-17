@@ -103,9 +103,9 @@ export function InfiniteArticles({ initialArticles, category, limit = 12 }: Infi
   return (
     <>
       {/* Articles Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {articles.map((article, index) => (
-          <div key={article.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 50}ms` }}>
+          <div key={article.id} className="animate-fade-in-up w-full" style={{ animationDelay: `${index * 50}ms` }}>
             <ArticleCard
               id={article.id}
               slug={article.slug}

@@ -5,8 +5,8 @@ import { MediaKitDownloader } from './media-kit-downloader'
 
 export async function TopBar() {
   return (
-    <div className="bg-primary text-primary-foreground py-2 px-4 text-sm">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
+    <div className="bg-primary text-primary-foreground py-2 px-4 sm:px-6 lg:px-8 text-sm">
+      <div className="max-w-full mx-auto flex justify-between items-center">
         <div className="flex gap-4">
           <Link href="/magazines" className="hover:underline font-semibold">
             Latest Magazine Issue

@@ -3,10 +3,9 @@
 import Link from 'next/link'
 import { Search } from 'lucide-react'
 import Image from 'next/image'
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { AdPlacement } from '@/components/ad-placement'
-import { SearchExperience } from '@/components/search/search-experience'
 
 interface Category {
   id: string
@@ -48,49 +47,51 @@ export function Header() {
 
   return (
     <>
-      {/* Main Header */}
+      {/* ===== MAIN HEADER ===== */}
       <header className="bg-background border-b border-gray-medium">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          {/* Logo + Top Page Leaderboard row */}
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            {/* Logo Row */}
-            <div className="flex items-center justify-between w-full md:w-auto">
-              <Link href="/" className="flex items-center gap-4 flex-shrink-0">
-                <Image 
-                  src="/logo.png" 
-                  alt="Farm & Livestock News Africa" 
-                  width={200} 
-                  height={80}
-                  className="h-16 w-auto"
-                  priority
-                />
-                <div className="hidden sm:block border-l border-gray-medium pl-4">
-                  <p className="text-sm font-semibold text-primary">Farm & Livestock News Africa</p>
-                  <p className="text-xs text-foreground/70">Independent Agriculture Reporting</p>
+        <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-4">
+          {/* 
+            Stable grid layout — three distinct regions:
+            Left:   logo (fixed height, does not grow/shrink)
+            Center: leaderboard ad (isolated, does not compress siblings)
+            Right:  search icon (fixed size)
+          */}
+          <div className="header-grid">
+            {/* ── Left region: Logo ── */}
+            <div className="header-logo-block">
+              <Link href="/" className="header-logo-link">
+                <div className="header-logo-container">
+                  <Image 
+                    src="/logo.png" 
+                    alt="Farm & Livestock News Africa" 
+                    fill
+                    className="header-logo-img"
+                    priority
+                  />
+                </div>
+                <div className="header-logo-text">
+                  <p className="header-logo-title">Farm & Livestock News Africa</p>
+                  <p className="header-logo-subtitle">Independent Agriculture Reporting</p>
                 </div>
               </Link>
-
-              {/* Mobile Search - only visible on small screens next to logo if needed, 
-                  but we have it in the right side div normally. 
-                  Let's keep search consistent. */}
             </div>
 
-            {/* Right Side: Top Page Leaderboard + Search */}
-            <div className="flex items-center gap-4 w-full md:w-auto md:flex-grow justify-end">
-              {/* TOP PAGE LEADERBOARD — single in-flow rotator (includes TOP_HEADER_AD alias) */}
-              <div className="hidden md:flex items-center justify-center flex-none top-page-leaderboard">
+            {/* ── Center region: Leaderboard ad (isolated) ── */}
+            <div className="header-ad-region">
+              <div className="header-ad-desktop">
                 <AdPlacement slug="TOP_PAGE_LEADERBOARD" width={728} height={90} variant="leaderboard" />
               </div>
-
-              <div className="flex md:hidden items-center justify-center flex-grow top-page-leaderboard">
+              <div className="header-ad-mobile">
                 <AdPlacement slug="TOP_PAGE_LEADERBOARD" width={320} height={50} variant="mobile" />
               </div>
+            </div>
 
-              {/* Search */}
+            {/* ── Right region: Search ── */}
+            <div className="header-search-block">
               <button 
                 onClick={() => console.log('Search clicked')}
                 aria-label="Search"
-                className="p-2 hover:bg-muted rounded-lg transition flex-shrink-0"
+                className="header-search-btn"
               >
                 <Search className="w-5 h-5 text-foreground" />
               </button>
@@ -99,9 +100,9 @@ export function Header() {
         </div>
       </header>
 
-      {/* Navigation */}
+      {/* ===== NAVIGATION ===== */}
       <nav className="bg-background border-b border-gray-medium sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-4 text-xs font-bold overflow-x-auto py-3 no-scrollbar">
             <Link 
               href="/" 

@@ -64,42 +64,40 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
   return (
     <SiteShell>
-      <div className="w-full">
+      <div className="py-8">
         {/* Article Header - Title, Meta, Category */}
-        <div className="pt-8 pb-4">
-          <div className="mb-6">
-            <div className="flex items-center gap-4 mb-4">
-              <span className="px-3 py-1 bg-orange-accent text-accent-foreground text-xs font-semibold rounded-full uppercase">
-                {article.category}
-              </span>
-              <span className="text-sm text-muted-foreground">
-                {formattedDate}
-              </span>
+        <div className="mb-10 max-w-4xl mx-auto px-0">
+          <div className="flex items-center gap-4 mb-4">
+            <span className="px-3 py-1 bg-orange-accent text-accent-foreground text-xs font-semibold rounded-full uppercase">
+              {article.category}
+            </span>
+            <span className="text-sm text-muted-foreground">
+              {formattedDate}
+            </span>
+          </div>
+          <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold text-primary mb-4 text-balance">
+            {article.title}
+          </h1>
+          <div className="flex items-center gap-6 text-muted-foreground">
+            <div>
+              <p className="text-sm font-semibold text-foreground">{article.author}</p>
+              <p className="text-xs">Author</p>
             </div>
-            <h1 className="font-serif text-4xl md:text-5xl font-bold text-primary mb-4 text-balance">
-              {article.title}
-            </h1>
-            <div className="flex items-center gap-6 text-muted-foreground">
-              <div>
-                <p className="text-sm font-semibold text-foreground">{article.author}</p>
-                <p className="text-xs">Author</p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm font-semibold text-foreground">{article.view_count || 0}</p>
-                <p className="text-xs">Views</p>
-              </div>
+            <div className="text-center">
+              <p className="text-sm font-semibold text-foreground">{article.view_count || 0}</p>
+              <p className="text-xs">Views</p>
             </div>
           </div>
+        </div>
 
-          {/* TOP ARTICLE AD */}
-          <div className="w-full py-2 flex justify-center mb-6">
-            <AdPlacement slug="ARTICLE_TOP" variant="leaderboard" />
-          </div>
+        {/* TOP ARTICLE AD */}
+        <div className="w-full py-2 flex justify-center mb-10">
+          <AdPlacement slug="ARTICLE_TOP" variant="leaderboard" />
         </div>
 
         {/* Article Hero Image - Full Width */}
         {article.featured_image_url && (
-          <div className="relative w-full h-96 bg-muted mb-12">
+          <div className="relative w-full h-64 sm:h-80 md:h-96 bg-muted mb-10">
             <Image
               src={article.featured_image_url}
               alt={article.title}
@@ -111,86 +109,81 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           </div>
         )}
 
-        {/* Article Content */}
-        <div className="py-8">
-          <div className="max-w-5xl mx-auto">
-            {article.excerpt && (
-              <p className="text-xl text-muted-foreground italic font-semibold mb-6 pb-6 border-b border-border">
-                {article.excerpt}
-              </p>
-            )}
+        {/* Article Content - Centered max-width container */}
+        <div className="max-w-4xl mx-auto px-0">
+          {article.excerpt && (
+            <p className="text-lg sm:text-xl text-muted-foreground italic font-semibold mb-6 pb-6 border-b border-border">
+              {article.excerpt}
+            </p>
+          )}
 
-            <article className="prose prose-lg max-w-none mb-12">
-              {contentParts.map((part, idx) => (
-                <div key={idx}>
-                  <p className="text-foreground leading-relaxed mb-4">{part}</p>
-                  {idx === Math.floor(contentParts.length / 2) - 1 && contentParts.length > 2 && (
-                    <div className="w-full py-4 flex justify-center not-prose">
-                      <AdPlacement slug="ARTICLE_MIDDLE" variant="native" />
-                    </div>
-                  )}
-                </div>
-              ))}
-            </article>
+          <article className="prose prose-lg max-w-none mb-10">
+            {contentParts.map((part, idx) => (
+              <div key={idx}>
+                <p className="text-foreground leading-relaxed mb-4">{part}</p>
+                {idx === Math.floor(contentParts.length / 2) - 1 && contentParts.length > 2 && (
+                  <div className="w-full py-4 flex justify-center not-prose">
+                    <AdPlacement slug="ARTICLE_MIDDLE" variant="native" />
+                  </div>
+                )}
+              </div>
+            ))}
+          </article>
 
-            {/* Author Bio */}
-            <div className="bg-card border border-border rounded-lg p-6 mb-12">
-              <div className="flex gap-4">
-                <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-primary-foreground font-bold text-lg">
-                    {article.author.split(' ').map((n: string) => n[0]).join('')}
-                  </span>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-foreground mb-2">{article.author}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Agricultural journalist and expert covering farming practices and agribusiness across Africa.
-                  </p>
-                </div>
+          {/* Author Bio */}
+          <div className="bg-card border border-border rounded-lg p-5 sm:p-6 mb-10">
+            <div className="flex gap-4">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-primary-foreground font-bold text-base sm:text-lg">
+                  {article.author.split(' ').map((n: string) => n[0]).join('')}
+                </span>
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">{article.author}</h3>
+                <p className="text-sm text-muted-foreground">
+                  Agricultural journalist and expert covering farming practices and agribusiness across Africa.
+                </p>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Related Articles */}
-        {related.length > 0 && (
-          <div className="bg-muted py-12 px-4 -mx-4">
-            <div className="max-w-5xl mx-auto">
-              <h2 className="font-serif text-3xl font-bold text-primary mb-8">Related Articles</h2>
-              <div className="grid md:grid-cols-3 gap-6">
-                {related.map((relatedArticle) => (
-                  <ArticleCard
-                    key={relatedArticle.id}
-                    id={relatedArticle.id}
-                    slug={relatedArticle.slug}
-                    title={relatedArticle.title}
-                    excerpt={relatedArticle.excerpt}
-                    featured_image_url={relatedArticle.featured_image_url}
-                    author={relatedArticle.author}
-                    published_at={relatedArticle.published_at}
-                    category={relatedArticle.category}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Bottom article slots */}
-        <div className="w-full py-4 flex justify-center">
-          <AdPlacement slug="ARTICLE_BOTTOM" variant="leaderboard" />
-        </div>
-
-        <div className="w-full py-4 flex justify-center">
-          <AdPlacement slug="BOTTOM_LEADERBOARD" variant="leaderboard" />
-        </div>
-
-        <div className="w-full py-4 flex justify-center">
-          <AdPlacement slug="BOTTOM_ROTATOR" variant="leaderboard" />
-        </div>
-
-        <MobileInlineAd />
       </div>
+
+      {/* Related Articles */}
+      {related.length > 0 && (
+        <div className="bg-muted py-10 sm:py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-primary mb-8">Related Articles</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {related.map((relatedArticle) => (
+                <ArticleCard
+                  key={relatedArticle.id}
+                  id={relatedArticle.id}
+                  slug={relatedArticle.slug}
+                  title={relatedArticle.title}
+                  excerpt={relatedArticle.excerpt}
+                  featured_image_url={relatedArticle.featured_image_url}
+                  author={relatedArticle.author}
+                  published_at={relatedArticle.published_at}
+                  category={relatedArticle.category}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bottom article slots */}
+      <div className="w-full py-4 flex justify-center">
+        <AdPlacement slug="ARTICLE_BOTTOM" variant="leaderboard" />
+      </div>
+      <div className="w-full py-4 flex justify-center">
+        <AdPlacement slug="BOTTOM_LEADERBOARD" variant="leaderboard" />
+      </div>
+      <div className="w-full py-4 flex justify-center">
+        <AdPlacement slug="BOTTOM_ROTATOR" variant="leaderboard" />
+      </div>
+      <MobileInlineAd />
     </SiteShell>
   )
 }

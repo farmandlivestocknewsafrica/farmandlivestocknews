@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
-// Hardcoded navigation categories with strict control
-// Maps to article category enum: crop_production, livestock_farming, technology_innovation, equipment_mechanisation, nutrition, agribusiness
+// Single source of truth for navigation categories
+// Maps to article category enum values used in the database
 const NAVIGATION_CATEGORIES = [
   {
     id: 'agribusiness',
@@ -38,6 +38,18 @@ const NAVIGATION_CATEGORIES = [
     name: 'Nutrition',
     slug: 'inputs-nutrition',
     key: 'nutrition'
+  },
+  {
+    id: 'policy_regulations',
+    name: 'Policy & Regulations',
+    slug: 'policy-regulations',
+    key: 'policy_regulations'
+  },
+  {
+    id: 'veterinary_protection',
+    name: 'Veterinary & Protection',
+    slug: 'veterinary-protection',
+    key: 'veterinary_protection'
   }
 ]
 

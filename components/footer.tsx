@@ -118,7 +118,7 @@ export function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-8">
             {/* Logo & Company Info */}
             <div className="md:col-span-1">
-              <div className="bg-white/10 rounded-xl p-4 mb-5 w-fit">
+              <div className="bg-white rounded-xl p-4 mb-5 w-fit shadow-md border border-white/10">
                 <Image
                   src="/logo.png"
                   alt="Farm & Livestock News Africa"

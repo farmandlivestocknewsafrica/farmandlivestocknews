@@ -5,11 +5,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7528826e-c203-48db-a148-0f064d646cf0" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/admin/login/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/admin/login/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/footer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/footer.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/password-input.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/password-input.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/next-env.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/next-env.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/[category]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/[category]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/agribusiness-investment/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/agribusiness-investment/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/agritech-innovation/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/agritech-innovation/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/articles/[slug]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/articles/[slug]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/category/[slug]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/category/[slug]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/crop-production/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/crop-production/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/equipment-mechanization/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/equipment-mechanization/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/globals.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/inputs-nutrition/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/inputs-nutrition/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/livestock-farming/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/livestock-farming/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/magazines/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/magazines/[id]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/magazines/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/magazines/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/policy-regulations/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/policy-regulations/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/veterinary-protection/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/veterinary-protection/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/article-card.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/article-card.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/feed-layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/feed-layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/home-page-client.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/home-page-client.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/sidebar-banners.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/sidebar-banners.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/site-shell.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/site-shell.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/top-bar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/top-bar.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,7 +34,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="237" />
+    <option name="cachedIndexableFilesCount" value="244" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="Git.Settings">
@@ -157,6 +174,7 @@
       <workItem from="1781615746776" duration="1124000" />
       <workItem from="1781678955141" duration="362000" />
       <workItem from="1781681113774" duration="138000" />
+      <workItem from="1781689010737" duration="110000" />
     </task>
     <servers />
   </component>
