@@ -9,7 +9,7 @@ export function SidebarBanners({ side }: { side: 'left' | 'right' }) {
   return (
     <aside
       className={cn(
-        'hidden 2xl:block flex-shrink-0 w-[160px]',
+        'hidden 2xl:block flex-shrink-0 w-[280px]',
         side === 'left' ? 'border-r border-border/30' : 'border-l border-border/30',
       )}
     >
@@ -18,8 +18,8 @@ export function SidebarBanners({ side }: { side: 'left' | 'right' }) {
           <AdPlacement
             key={`${prefix}_${i}`}
             slug={`${prefix}_${i}`}
-            width={160}
-            height={600}
+            width={280}
+            height={900}
             variant="sidebar"
           />
         ))}
