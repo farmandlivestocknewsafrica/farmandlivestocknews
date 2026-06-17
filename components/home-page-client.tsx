@@ -1,5 +1,5 @@
 import { ArticleCard } from '@/components/article-card'
-import { AdSlot } from '@/components/ad-slot'
+import { AdPlacement, MobileInlineAd } from '@/components/ad-placement'
 import { FeedLayout } from '@/components/feed-layout'
 import Image from 'next/image'
 
@@ -40,8 +40,8 @@ export function HomePageClient({
     // Insert inline ad every 7 articles as a full-width grid break
     if ((index + 1) % 7 === 0) {
       feedItems.push(
-        <div key={`ad-${index}`} className="col-span-full w-full py-6 flex justify-center">
-          <AdSlot slug="IN_CONTENT_NATIVE" />
+        <div key={`ad-${index}`} className="col-span-full w-full">
+          <AdPlacement slug="IN_CONTENT_NATIVE" variant="native" />
         </div>
       )
     }
@@ -118,9 +118,7 @@ export function HomePageClient({
       )}
 
       {/* === IN-CONTENT AD === */}
-      <div className="w-full flex justify-center">
-        <AdSlot slug="IN_CONTENT_NATIVE" />
-      </div>
+      <AdPlacement slug="IN_CONTENT_NATIVE" variant="native" />
 
       {/* === LATEST NEWS FEED === */}
       <section className="py-4 border-t border-border">

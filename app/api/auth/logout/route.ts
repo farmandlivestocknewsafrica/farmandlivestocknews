@@ -1,19 +1,27 @@
-import { clearSessionCookie } from '@/lib/auth/session'
-import { NextRequest, NextResponse } from 'next/server'
+import { getSession } from '@/lib/auth/session'
+import { logoutCurrentSession } from '@/lib/auth/unified-session'
+import { clearSessionCookies } from '@/lib/auth/cookie-config'
+import { NextResponse } from 'next/server'
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   try {
-    await clearSessionCookie()
-    
-    return NextResponse.json(
+    await logoutCurrentSession()
+
+    const response = NextResponse.json(
       { message: 'Logged out successfully' },
-      { status: 200 }
+      { status: 200 },
     )
+
+    clearSessionCookies(response)
+    return response
   } catch (error) {
-    console.error('[v0] Logout error:', error)
-    return NextResponse.json(
+    console.error('[auth] Logout error:', error)
+
+    const response = NextResponse.json(
       { message: 'Logout failed' },
-      { status: 500 }
+      { status: 500 },
     )
+    clearSessionCookies(response)
+    return response
   }
 }

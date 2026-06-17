@@ -1,7 +1,8 @@
 import Link from 'next/link'
-import { FileText, Users, Eye, TrendingUp, Trash2, Edit, Image, BookOpen, AlertCircle, Settings, Megaphone, PlusCircle, ArrowUpRight } from 'lucide-react'
+import { FileText, Users, Eye, TrendingUp, Trash2, Edit, PlusCircle, ArrowUpRight } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { cn } from '@/lib/utils'
+import { AdminAccountBadge } from '@/components/admin/admin-account-badge'
 
 // Force dynamic rendering since we need cookies for auth
 export const dynamic = 'force-dynamic'
@@ -51,11 +52,12 @@ export default async function AdminDashboard() {
           <h1 className="text-3xl font-serif font-bold text-primary">Dashboard</h1>
           <p className="text-muted-foreground">Overview of your publishing performance</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <AdminAccountBadge />
           <Link
             href="/"
             target="_blank"
-            className="flex items-center gap-2 px-4 py-2 border border-border rounded-lg hover:bg-muted transition text-sm font-medium"
+            className="flex items-center justify-center gap-2 px-4 py-2 border border-border rounded-lg hover:bg-muted transition text-sm font-medium"
           >
             <ArrowUpRight className="w-4 h-4" />
             View Live Site

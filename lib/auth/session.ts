@@ -1,10 +1,12 @@
-import { jwtVerify, SignJWT } from 'jose'
 import { cookies } from 'next/headers'
-
-const SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key-change-in-production')
-const ALGORITHM = 'HS256'
-const COOKIE_NAME = 'admin_session'
-const SESSION_DURATION = 3650 * 24 * 60 * 60 // 10 years in seconds
+import { getCurrentSession } from './unified-session'
+import {
+  createToken,
+  getSessionTokenFromCookies,
+  getUserIdFromPayload,
+  verifyToken,
+} from './token'
+import { SESSION_COOKIE_OPTIONS } from './cookie-config'
 
 export interface SessionPayload {
   adminId: string
@@ -15,68 +17,66 @@ export interface SessionPayload {
 }
 
 /**
- * Create a JWT session token
+ * Create a JWT session token (legacy API — prefer createAuthSession).
  */
-export async function createSession(payload: Omit<SessionPayload, 'iat' | 'exp'>): Promise<string> {
-  const token = await new SignJWT(payload)
-    .setProtectedHeader({ alg: ALGORITHM })
-    .setIssuedAt()
-    .setExpirationTime('3650d')
-    .sign(SECRET)
-
-  return token
+export async function createSession(
+  payload: Omit<SessionPayload, 'iat' | 'exp'>,
+): Promise<string> {
+  return createToken({
+    userId: payload.adminId,
+    email: payload.email,
+    role: payload.role,
+  })
 }
 
-/**
- * Verify and parse a JWT session token
- */
 export async function verifySession(token: string): Promise<SessionPayload | null> {
-  try {
-    const verified = await jwtVerify(token, SECRET)
-    return verified.payload as SessionPayload
-  } catch (error) {
-    console.error('[v0] Session verification failed:', error)
-    return null
+  const payload = await verifyToken(token)
+  if (!payload) return null
+
+  const adminId = getUserIdFromPayload(payload)
+  if (!adminId) return null
+
+  return {
+    adminId,
+    email: payload.email,
+    role: payload.role as SessionPayload['role'],
+    iat: payload.iat,
+    exp: payload.exp,
   }
 }
 
 /**
- * Get session from cookies
+ * Get session from cookies — unified across auth_session and admin_session.
  */
 export async function getSession(): Promise<SessionPayload | null> {
-  const cookieStore = await cookies()
-  const token = cookieStore.get(COOKIE_NAME)?.value
+  const authSession = await getCurrentSession()
+  if (authSession) {
+    return {
+      adminId: authSession.user.id,
+      email: authSession.user.email,
+      role: authSession.user.role as SessionPayload['role'],
+    }
+  }
 
+  const cookieStore = await cookies()
+  const token = getSessionTokenFromCookies(cookieStore)
   if (!token) return null
 
   return verifySession(token)
 }
 
-/**
- * Set session cookie
- */
 export async function setSessionCookie(token: string): Promise<void> {
   const cookieStore = await cookies()
-  cookieStore.set(COOKIE_NAME, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: SESSION_DURATION,
-    path: '/'
-  })
+  cookieStore.set('auth_session', token, SESSION_COOKIE_OPTIONS)
+  cookieStore.set('admin_session', token, SESSION_COOKIE_OPTIONS)
 }
 
-/**
- * Clear session cookie
- */
 export async function clearSessionCookie(): Promise<void> {
   const cookieStore = await cookies()
-  cookieStore.delete(COOKIE_NAME)
+  cookieStore.delete('auth_session')
+  cookieStore.delete('admin_session')
 }
 
-/**
- * Check if user has required role
- */
 export function hasRole(userRole: string, requiredRole: string): boolean {
   const roles = ['editor', 'moderator', 'admin', 'superadmin']
   const userRoleIndex = roles.indexOf(userRole)

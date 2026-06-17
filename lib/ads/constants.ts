@@ -73,6 +73,17 @@ export function getValidSlots(): AdSlotType[] {
 export type SlotScope = 'global' | 'homepage' | 'article' | 'mobile'
 
 /**
+ * Additional slot slugs whose campaigns rotate inside a primary slot container.
+ * e.g. TOP_HEADER_AD creatives share the TOP_PAGE_LEADERBOARD rotator.
+ */
+export const SLOT_ROTATION_ALIASES: Partial<Record<AdSlotType, AdSlotType[]>> = {
+  TOP_PAGE_LEADERBOARD: ['TOP_HEADER_AD'],
+}
+
+/** Client-side rotation interval for in-slot carousel (ms) */
+export const AD_ROTATION_INTERVAL_MS = 15_000
+
+/**
  * Allowed ad file formats for uploads
  */
 export const ALLOWED_AD_FORMATS = {
@@ -320,11 +331,11 @@ export const SLOT_CONFIG: Record<AdSlotType, {
   },
   MOBILE_STICKY: {
     title: 'Mobile Sticky Footer',
-    description: 'Sticky anchored banner at bottom of mobile viewport',
+    description: 'Deprecated — use MOBILE_INLINE (in-flow) instead. No fixed overlays.',
     defaultWidth: 320,
     defaultHeight: 50,
     scope: 'mobile',
-    position: 'mobile-sticky',
+    position: 'mobile-sticky-deprecated',
     rotating: true,
   },
   MOBILE_INLINE: {

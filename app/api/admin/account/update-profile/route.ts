@@ -8,33 +8,40 @@ export async function PUT(request: Request) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { adminId, displayName, email } = await request.json()
+    const { full_name, display_name, phone, bio, avatar_url } = await request.json()
 
-    // Security: ensure user can only update their own profile
-    if (adminId !== session.id) {
-      return Response.json({ error: 'Unauthorized' }, { status: 403 })
+    if (!full_name?.trim()) {
+      return Response.json({ error: 'Full name is required' }, { status: 400 })
     }
 
     const supabase = await createClient()
 
-    // Update profile
     const { error } = await supabase
       .from('admin_accounts')
       .update({
-        display_name: displayName,
-        email: email,
-        updated_at: new Date().toISOString()
+        full_name: full_name.trim(),
+        display_name: display_name?.trim() || null,
+        phone: phone?.trim() || null,
+        bio: bio?.trim() || null,
+        avatar_url: avatar_url?.trim() || null,
+        updated_at: new Date().toISOString(),
       })
-      .eq('id', adminId)
+      .eq('id', session.adminId)
 
     if (error) {
-      console.error('[v0] Update profile error:', error)
+      console.error('[admin] Update profile error:', error)
       return Response.json({ error: 'Failed to update profile' }, { status: 500 })
     }
 
+    await supabase.from('admin_logs').insert({
+      admin_id: session.adminId,
+      action: 'profile_update',
+      description: 'Updated profile information',
+    })
+
     return Response.json({ message: 'Profile updated successfully' })
   } catch (error) {
-    console.error('[v0] Update profile error:', error)
+    console.error('[admin] Update profile error:', error)
     return Response.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

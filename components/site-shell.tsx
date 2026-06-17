@@ -21,9 +21,9 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen flex flex-col bg-background">
       <TopBar />
       <Header />
-      <div className="flex-1 flex justify-center">
+      <div className="flex-1 flex justify-center items-start gap-10 xl:gap-14 2xl:gap-20 px-4 sm:px-6 lg:px-8 w-full">
         <SidebarBanners side="left" />
-        <main className="flex-1 max-w-7xl">
+        <main className="flex-1 max-w-7xl min-w-0 w-full">
           {children}
         </main>
         <SidebarBanners side="right" />

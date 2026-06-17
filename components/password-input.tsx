@@ -9,6 +9,7 @@ interface PasswordInputProps {
   onChange: (value: string) => void
   placeholder?: string
   required?: boolean
+  disabled?: boolean
   className?: string
   'aria-label'?: string
 }
@@ -19,6 +20,7 @@ export function PasswordInput({
   onChange,
   placeholder = 'Enter password',
   required = false,
+  disabled = false,
   className = '',
   'aria-label': ariaLabel
 }: PasswordInputProps) {
@@ -33,8 +35,9 @@ export function PasswordInput({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         required={required}
+        disabled={disabled}
         aria-label={ariaLabel}
-        className={`w-full px-4 py-2 pr-12 border border-border rounded-lg bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary ${className}`}
+        className={`w-full px-4 py-2 pr-12 border border-border rounded-lg bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed ${className}`}
       />
       <button
         type="button"

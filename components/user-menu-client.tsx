@@ -19,14 +19,29 @@ export function UserMenuClient({ email, name, role }: UserMenuProps) {
   const isAdmin = ['admin', 'superadmin', 'editor'].includes(role)
   const displayName = name || email?.split('@')[0] || 'User'
 
+  if (isAdmin) {
+    return (
+      <Link
+        href="/admin/dashboard"
+        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-primary-foreground/10 transition text-sm font-medium"
+        aria-label="Go to admin dashboard"
+      >
+        <User className="w-4 h-4" />
+        <span className="hidden sm:inline truncate max-w-[150px]">{displayName}</span>
+      </Link>
+    )
+  }
+
   async function handleLogout() {
     setIsLoading(true)
     try {
       const response = await fetch('/api/auth/logout', {
         method: 'POST',
+        credentials: 'include',
       })
 
       if (response.ok) {
+        window.dispatchEvent(new Event('auth:change'))
         router.push('/')
         router.refresh()
       }
@@ -68,17 +83,6 @@ export function UserMenuClient({ email, name, role }: UserMenuProps) {
               <Settings className="w-4 h-4" />
               <span>Account Settings</span>
             </Link>
-
-            {isAdmin && (
-              <Link
-                href="/admin/dashboard"
-                className="flex items-center gap-3 px-4 py-2 text-sm text-primary font-medium hover:bg-muted transition"
-                onClick={() => setIsOpen(false)}
-              >
-                <span>→</span>
-                <span>Admin Dashboard</span>
-              </Link>
-            )}
 
             <button
               onClick={() => {

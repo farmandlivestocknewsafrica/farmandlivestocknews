@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { Mail, Lock, LogOut, Loader } from 'lucide-react'
-import { getCurrentSession, getUserSessions, logoutCurrentSession } from '@/lib/auth/unified-session'
 import type { AuthUser } from '@/lib/auth/auth-context'
 
 interface Props {

@@ -6,7 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="7528826e-c203-48db-a148-0f064d646cf0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/admin/login/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/admin/login/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/footer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/footer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/password-input.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/password-input.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/next-env.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/next-env.d.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,23 +29,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0000000192505785" />
-      <entry key="MS500" value="1.049583395576911" />
-      <entry key="S2" value="1.7934026434998471" />
-      <entry key="S5" value="2.381676643044641" />
-      <entry key="S10" value="2.6623279203815735" />
-      <entry key="S30" value="2.880436022348624" />
-      <entry key="S60" value="2.9392966044215267" />
-      <entry key="M2" value="2.969414385541361" />
-      <entry key="M5" value="2.987709308306205" />
-      <entry key="M10" value="2.9949649845516957" />
-      <entry key="M15" value="3.017462695134574" />
-      <entry key="M30" value="3.4133310167855266" />
-      <entry key="H1" value="4.821903980822759" />
-      <entry key="H2" value="6.818314549594091" />
-      <entry key="H4" value="8.527005178131397" />
-      <entry key="D1" value="10.521841760298985" />
-      <entry key="W1" value="10.929874612043385" />
+      <entry key="MS100" value="1.360095827301726" />
+      <entry key="MS500" value="3.241102259321122" />
+      <entry key="S2" value="5.762456649810969" />
+      <entry key="S5" value="8.417597330898888" />
+      <entry key="S10" value="11.184095074073841" />
+      <entry key="S30" value="16.202111838990497" />
+      <entry key="S60" value="19.36823640770054" />
+      <entry key="M2" value="21.756032411326096" />
+      <entry key="M5" value="23.57858349934108" />
+      <entry key="M10" value="24.267619104007853" />
+      <entry key="M15" value="24.526338005167243" />
+      <entry key="M30" value="25.15520679426611" />
+      <entry key="H1" value="26.67432174164406" />
+      <entry key="H2" value="28.731645923672865" />
+      <entry key="H4" value="30.47817713051488" />
+      <entry key="D1" value="32.51263555804778" />
+      <entry key="W1" value="32.92852823098186" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -64,23 +67,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="6.082315017990287E-6" />
-      <entry key="MS500" value="0.13341487069246313" />
-      <entry key="S2" value="1.3110087368355356" />
-      <entry key="S5" value="2.1459573515675987" />
-      <entry key="S10" value="2.535678714274746" />
-      <entry key="S30" value="2.836076555082544" />
-      <entry key="S60" value="2.916836059185791" />
-      <entry key="M2" value="2.9581128972683945" />
-      <entry key="M5" value="2.9831714896529826" />
-      <entry key="M10" value="2.992692925979573" />
-      <entry key="M15" value="3.0159440912177633" />
-      <entry key="M30" value="3.4125400449516112" />
-      <entry key="H1" value="4.821452407811299" />
-      <entry key="H2" value="6.81804904047137" />
-      <entry key="H4" value="8.526855427819058" />
-      <entry key="D1" value="10.521813495237904" />
-      <entry key="W1" value="10.929870477558621" />
+      <entry key="MS100" value="1.3138283306494125" />
+      <entry key="MS500" value="3.2190499815814335" />
+      <entry key="S2" value="5.752314436274696" />
+      <entry key="S5" value="8.41121721640831" />
+      <entry key="S10" value="11.178064527780101" />
+      <entry key="S30" value="16.187880333037374" />
+      <entry key="S60" value="19.35388751036236" />
+      <entry key="M2" value="21.745705330271168" />
+      <entry key="M5" value="23.573428210285254" />
+      <entry key="M10" value="24.264842505530723" />
+      <entry key="M15" value="24.52443737205286" />
+      <entry key="M30" value="25.154202038161767" />
+      <entry key="H1" value="26.67375778429733" />
+      <entry key="H2" value="28.73132273236176" />
+      <entry key="H4" value="30.477998092570548" />
+      <entry key="D1" value="32.51260233623905" />
+      <entry key="W1" value="32.92852338628849" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -92,32 +95,32 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "main",
-    "js.debugger.nextJs.config.created.client": "true",
-    "js.debugger.nextJs.config.created.server": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "C:/Users/TERRA/Desktop/Muhali/farm-livestock-news Final",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "pnpm",
-    "settings.editor.selected.configurable": "preferences.keymap",
-    "to.speed.mode.migration.done": "true",
-    "ts.external.directory.path": "C:\\Users\\TERRA\\Desktop\\Muhali\\farm-livestock-news Final\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;js.debugger.nextJs.config.created.client&quot;: &quot;true&quot;,
+    &quot;js.debugger.nextJs.config.created.server&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/TERRA/Desktop/Muhali/farm-livestock-news Final&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;pnpm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\TERRA\\Desktop\\Muhali\\farm-livestock-news Final\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="npm.Next.js: server-side">
     <configuration name="Next.js: debug client-side" type="JavascriptDebugType" uri="http://localhost:3000/">
       <method v="2" />
@@ -152,10 +155,23 @@
       <workItem from="1781596022962" duration="1863000" />
       <workItem from="1781603758637" duration="8116000" />
       <workItem from="1781615746776" duration="1124000" />
+      <workItem from="1781678955141" duration="362000" />
+      <workItem from="1781681113774" duration="138000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

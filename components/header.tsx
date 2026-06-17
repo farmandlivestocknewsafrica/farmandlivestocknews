@@ -5,7 +5,7 @@ import { Search } from 'lucide-react'
 import Image from 'next/image'
 import { useEffect, useState, useMemo } from 'react'
 import { usePathname } from 'next/navigation'
-import { AdSlot } from '@/components/ad-slot'
+import { AdPlacement } from '@/components/ad-placement'
 import { SearchExperience } from '@/components/search/search-experience'
 
 interface Category {
@@ -77,31 +77,13 @@ export function Header() {
 
             {/* Right Side: Top Page Leaderboard + Search */}
             <div className="flex items-center gap-4 w-full md:w-auto md:flex-grow justify-end">
-              {/* TOP PAGE LEADERBOARD - right of logo, above nav
-                   Fallback logic: Try TOP_PAGE_LEADERBOARD first, then TOP_HEADER_AD.
-                   Fixed width/height to prevent layout shifts. */}
-              <div className="hidden md:flex items-center justify-center flex-none w-[728px] h-[90px] bg-muted/5 rounded relative overflow-hidden">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <AdSlot slug="TOP_PAGE_LEADERBOARD" width={728} height={90} className="relative z-10" />
-                </div>
-                {/* 
-                  Note: We render both but AdSlot handles the "only one" logic via its own fetch.
-                  To truly fallback, we would need to know if the first one failed.
-                  For now, we keep them both as requested for compatibility, 
-                  but ideally the AdResolver would handle slug aliases.
-                */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <AdSlot slug="TOP_HEADER_AD" width={728} height={90} className="relative z-0" />
-                </div>
+              {/* TOP PAGE LEADERBOARD — single in-flow rotator (includes TOP_HEADER_AD alias) */}
+              <div className="hidden md:flex items-center justify-center flex-none top-page-leaderboard">
+                <AdPlacement slug="TOP_PAGE_LEADERBOARD" width={728} height={90} variant="leaderboard" />
               </div>
-              
-              <div className="flex md:hidden items-center justify-center flex-grow min-h-[50px] bg-muted/5 rounded relative overflow-hidden">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <AdSlot slug="TOP_PAGE_LEADERBOARD" width={320} height={50} />
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <AdSlot slug="TOP_HEADER_AD" width={320} height={50} />
-                </div>
+
+              <div className="flex md:hidden items-center justify-center flex-grow top-page-leaderboard">
+                <AdPlacement slug="TOP_PAGE_LEADERBOARD" width={320} height={50} variant="mobile" />
               </div>
 
               {/* Search */}

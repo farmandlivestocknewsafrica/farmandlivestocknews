@@ -1,5 +1,5 @@
 import { createClient, createAdminClient } from '@/lib/supabase/server'
-import { validateSlotSlug, SLOT_CONFIG, type AdSlotType } from '@/lib/ads/constants'
+import { validateSlotSlug, SLOT_CONFIG, SLOT_ROTATION_ALIASES, type AdSlotType } from '@/lib/ads/constants'
 import { isCampaignActive, normalizeWeight, selectByWeight } from '@/lib/ads/utils'
 import type { AdForSlot } from '@/lib/types/ads'
 
@@ -52,6 +52,8 @@ const slotCache = new Map<string, CacheEntry>()
 export function invalidateAdCache(slotSlug?: string) {
   if (slotSlug) {
     slotCache.delete(slotSlug)
+    const aliases = SLOT_ROTATION_ALIASES[slotSlug as AdSlotType]
+    aliases?.forEach((alias) => slotCache.delete(alias))
   } else {
     slotCache.clear()
   }
@@ -205,11 +207,14 @@ export async function resolveAd(slotSlug: string): Promise<AdForSlot | null> {
     return null
   }
 
-  const candidates = await getCandidates(slotSlug)
+  const candidates = await getCandidatesForRotation(slotSlug)
   const selected = selectCandidate(candidates)
-
   if (!selected) return null
 
+  return candidateToAd(selected)
+}
+
+function candidateToAd(selected: ResolvedCandidate): AdForSlot {
   return {
     id: selected.campaignId,
     image_url: selected.imageUrl,
@@ -217,6 +222,43 @@ export async function resolveAd(slotSlug: string): Promise<AdForSlot | null> {
     title: selected.title,
     advertiser_name: selected.advertiserName,
   }
+}
+
+/**
+ * Gather candidates from a slot and any configured alias slots.
+ */
+async function getCandidatesForRotation(slotSlug: AdSlotType): Promise<ResolvedCandidate[]> {
+  const aliasSlugs = SLOT_ROTATION_ALIASES[slotSlug] ?? []
+  const slugs = [slotSlug, ...aliasSlugs]
+
+  const seen = new Set<string>()
+  const merged: ResolvedCandidate[] = []
+
+  for (const slug of slugs) {
+    const candidates = await getCandidates(slug)
+    for (const c of candidates) {
+      if (seen.has(c.campaignId)) continue
+      seen.add(c.campaignId)
+      merged.push(c)
+    }
+  }
+
+  merged.sort((a, b) => b.priority - a.priority || a.title.localeCompare(b.title))
+  return merged
+}
+
+/**
+ * Returns all eligible ads for client-side in-slot rotation.
+ * Order is stable (priority desc, then title) for sequential rotation.
+ */
+export async function resolveRotationAds(slotSlug: string): Promise<AdForSlot[]> {
+  if (!validateSlotSlug(slotSlug)) {
+    console.error(`[v0] Resolver: invalid slot "${slotSlug}"`)
+    return []
+  }
+
+  const candidates = await getCandidatesForRotation(slotSlug)
+  return candidates.map(candidateToAd)
 }
 
 /**

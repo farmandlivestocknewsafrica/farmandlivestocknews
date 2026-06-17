@@ -1,6 +1,6 @@
 import { SiteShell } from '@/components/site-shell'
 import { ArticleCard } from '@/components/article-card'
-import { AdSlot } from '@/components/ad-slot'
+import { AdPlacement, MobileInlineAd } from '@/components/ad-placement'
 import { createClient } from '@/lib/supabase/server'
 
 async function getCategoryData() {
@@ -29,7 +29,7 @@ export default async function AgritechPage() {
     <SiteShell>
       <main className="flex-1">
         <div className="w-full py-3 flex justify-center px-4 bg-muted/20">
-          <AdSlot slug="HOME_LEADERBOARD_PRIMARY" />
+          <AdPlacement slug="HOME_LEADERBOARD_PRIMARY" variant="leaderboard" />
         </div>
         <div className="w-full px-4 py-12">
           <div className="mb-12 animate-fade-in-down">
@@ -42,7 +42,7 @@ export default async function AgritechPage() {
             </h1>
           </div>
           {articles.length > 0 ? (
-            <div className="flex gap-6 relative">
+            <div className="flex gap-10 xl:gap-14 2xl:gap-20 items-start relative">
               <div className="flex-1 min-w-0">
                 <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {articles.map((article, index) => (
@@ -59,10 +59,10 @@ export default async function AgritechPage() {
             </div>
           )}
         </div>
-        <div className="w-full py-3 flex justify-center px-4"><AdSlot slug="IN_CONTENT_NATIVE" /></div>
-        <div className="w-full py-3 flex justify-center px-4"><AdSlot slug="BOTTOM_LEADERBOARD" /></div>
-        <div className="w-full py-3 flex justify-center px-4"><AdSlot slug="BOTTOM_ROTATOR" /></div>
-        <div className="md:hidden fixed bottom-0 left-0 right-0 w-full py-2 flex justify-center px-2 bg-background border-t border-border z-40"><AdSlot slug="MOBILE_STICKY" width={320} height={50} /></div>
+        <AdPlacement slug="IN_CONTENT_NATIVE" variant="native" className="px-4" />
+        <div className="w-full py-3 flex justify-center px-4"><AdPlacement slug="BOTTOM_LEADERBOARD" variant="leaderboard" /></div>
+        <div className="w-full py-3 flex justify-center px-4"><AdPlacement slug="BOTTOM_ROTATOR" variant="leaderboard" /></div>
+        <MobileInlineAd />
       </main>
     </SiteShell>
   )

@@ -1,6 +1,6 @@
 import { HomePageClient } from '@/components/home-page-client'
 import { SiteShell } from '@/components/site-shell'
-import { AdSlot } from '@/components/ad-slot'
+import { AdPlacement, MobileInlineAd } from '@/components/ad-placement'
 import { createClient } from '@/lib/supabase/server'
 
 async function getHomepageData() {
@@ -48,31 +48,24 @@ export default async function Home() {
       <div className="w-full">
         {/* Home Page Leaderboard Primary - below nav, above content */}
         <div className="home-page-leaderboard w-full flex justify-center py-6 mb-4">
-          <AdSlot slug="HOME_LEADERBOARD_PRIMARY" />
+          <AdPlacement slug="HOME_LEADERBOARD_PRIMARY" variant="leaderboard" />
         </div>
 
-        {/* Home Page Leaderboard Secondary - below primary */}
         <div className="w-full flex justify-center py-4 mb-4">
-          <AdSlot slug="HOME_LEADERBOARD_SECONDARY" />
+          <AdPlacement slug="HOME_LEADERBOARD_SECONDARY" variant="leaderboard" />
         </div>
 
-        {/* Content stream */}
         <HomePageClient featured={featured} articles={articles} trending={trending} />
 
-        {/* Bottom Leaderboard - before footer */}
         <div className="w-full py-4 flex justify-center">
-          <AdSlot slug="BOTTOM_LEADERBOARD" />
+          <AdPlacement slug="BOTTOM_LEADERBOARD" variant="leaderboard" />
         </div>
 
-        {/* Bottom Rotator - below bottom leaderboard */}
         <div className="w-full py-4 flex justify-center">
-          <AdSlot slug="BOTTOM_ROTATOR" />
+          <AdPlacement slug="BOTTOM_ROTATOR" variant="leaderboard" />
         </div>
-      </div>
 
-      {/* MOBILE STICKY AD */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 w-full py-2 flex justify-center px-2 bg-background border-t border-border z-40">
-        <AdSlot slug="MOBILE_STICKY" width={320} height={50} />
+        <MobileInlineAd />
       </div>
     </SiteShell>
   )

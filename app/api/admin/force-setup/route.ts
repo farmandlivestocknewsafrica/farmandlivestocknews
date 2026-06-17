@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { hashPassword, verifyPassword } from '@/lib/auth/password'
+import { getSessionTokenFromCookies } from '@/lib/auth/token'
 import { verifySession } from '@/lib/auth/session'
+import { clearSessionCookies } from '@/lib/auth/cookie-config'
+import { logoutCurrentSession } from '@/lib/auth/unified-session'
 
 export async function POST(request: NextRequest) {
   try {
     // Verify admin is logged in
-    const token = request.cookies.get('admin_session')?.value
+    const token = getSessionTokenFromCookies(request.cookies)
     if (!token) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
@@ -105,15 +108,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ message: 'Failed to update email' }, { status: 500 })
       }
 
-      // Create response and clear session cookie
+      // Invalidate session after email change — user must re-login
+      await logoutCurrentSession()
       const response = NextResponse.json({ message: 'Email updated successfully' })
-      response.cookies.set('admin_session', '', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 0
-      })
-
+      clearSessionCookies(response)
       return response
     }
 

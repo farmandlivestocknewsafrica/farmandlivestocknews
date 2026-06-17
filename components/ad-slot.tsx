@@ -1,15 +1,18 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import type { AdForSlot } from '@/lib/types/ads'
-import { validateSlotSlug, SLOT_CONFIG } from '@/lib/ads/constants'
+import { validateSlotSlug, SLOT_CONFIG, AD_ROTATION_INTERVAL_MS } from '@/lib/ads/constants'
+import { cn } from '@/lib/utils'
 
 interface AdSlotProps {
   slug: string
   width?: number
   height?: number
   className?: string
+  /** Reserve slot dimensions when empty (prevents CLS) */
+  reserveSpace?: boolean
 }
 
 function getSessionId(): string {
@@ -26,79 +29,89 @@ function getSessionId(): string {
   return sessionId
 }
 
-/**
- * AdSlot - Renders one resolved ad for a slot.
- *
- * - Fetches resolved ad from /api/ads/slots/[slug] (server-cached)
- * - Tracks impression via POST /api/ads/impression only when the ad
- *   actually enters the viewport (IntersectionObserver, 50% visible)
- * - Tracks clicks via POST /api/ads/click (debounced)
- * - Renders nothing visible when no campaign exists (no layout break)
- * - React Strict Mode safe (refs guard double-fire)
- */
-export function AdSlot({ slug, width, height, className = '' }: AdSlotProps) {
-  const [ad, setAd] = useState<AdForSlot | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [failed, setFailed] = useState(false)
+function getRotationIndex(slug: string, count: number): number {
+  if (count <= 1) return 0
+  try {
+    const key = `ad-rotation-index:${slug}`
+    const stored = sessionStorage.getItem(key)
+    const idx = stored ? parseInt(stored, 10) : 0
+    return Number.isFinite(idx) ? idx % count : 0
+  } catch {
+    return 0
+  }
+}
 
-  const fetchAttempted = useRef(false)
-  const impressionSent = useRef(false)
+function setRotationIndex(slug: string, index: number) {
+  try {
+    sessionStorage.setItem(`ad-rotation-index:${slug}`, String(index))
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * AdSlot — single fixed container; multiple creatives rotate inside via crossfade.
+ * Always in document flow. No viewport overlays.
+ */
+export function AdSlot({ slug, width, height, className = '', reserveSpace = true }: AdSlotProps) {
+  const [ads, setAds] = useState<AdForSlot[]>([])
+  const [activeIndex, setActiveIndex] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [failedIds, setFailedIds] = useState<Set<string>>(new Set())
+
+  const impressionSent = useRef<Set<string>>(new Set())
   const lastClickTime = useRef<number>(0)
-  const containerRef = useRef<HTMLButtonElement | null>(null)
+  const containerRef = useRef<HTMLDivElement | null>(null)
 
   const config = validateSlotSlug(slug) ? SLOT_CONFIG[slug] : null
   const adWidth = width ?? config?.defaultWidth ?? 300
   const adHeight = height ?? config?.defaultHeight ?? 250
   const isRotating = config?.rotating ?? false
 
-  // Fetch resolved ad with retry for dev mode resilience
+  const visibleAds = ads.filter((ad) => !failedIds.has(ad.id))
+  const hasAds = visibleAds.length > 0
+  const showRotator = isRotating && visibleAds.length > 1
+
+  const containerStyle = {
+    width: '100%',
+    maxWidth: `${adWidth}px`,
+    height: `${adHeight}px`,
+  } as const
+
+  // Fetch all rotation candidates once; refresh pool periodically
   useEffect(() => {
     let cancelled = false
-    let retryCount = 0
-    const maxRetries = 2
 
-    const fetchAd = async () => {
-      const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
-      const url = `${baseUrl}/api/ads/slots/${slug}`
-      console.log(`[AdSlot] Fetching ad for slot: ${slug}`)
+    const fetchAds = async () => {
       try {
+        const url = `/api/ads/slots/${slug}?rotate=1`
         const response = await fetch(url, {
           headers: { 'x-session-id': getSessionId() },
-          cache: 'no-store'
+          cache: 'no-store',
         })
-        console.log(`[AdSlot] Response status for ${slug}: ${response.status}`)
         if (!response.ok) throw new Error(response.statusText)
         const data = await response.json()
-        console.log(`[AdSlot] Data for ${slug}:`, data)
-        if (!cancelled) {
-          setAd(data.ad || null)
-          setFailed(false)
+        if (cancelled) return
+
+        const fetched: AdForSlot[] = data.ads || []
+        setAds(fetched)
+
+        if (fetched.length > 0) {
+          const startIdx = getRotationIndex(slug, fetched.length)
+          setActiveIndex(startIdx)
         }
-      } catch (err: any) {
-        if (err.name === 'AbortError') return
-        console.error(`[v0] Error fetching ad for slot "${slug}":`, {
-          message: err.message,
-          slug
-        })
-        if (!cancelled && retryCount < maxRetries) {
-          retryCount++
-          setTimeout(fetchAd, 1000 * retryCount)
-        } else if (!cancelled) {
-          setAd(prev => prev || null)
-        }
+      } catch (err) {
+        console.error(`[AdSlot] Error fetching ads for "${slug}":`, err)
       } finally {
-        if (!cancelled) {
-          setLoading(false)
-        }
+        if (!cancelled) setLoading(false)
       }
     }
 
-    fetchAd()
+    fetchAds()
 
-    // Setup rotation interval if enabled
-    let interval: NodeJS.Timeout | null = null
+    let interval: ReturnType<typeof setInterval> | null = null
     if (isRotating) {
-      interval = setInterval(fetchAd, 15000)
+      interval = setInterval(fetchAds, AD_ROTATION_INTERVAL_MS * 2)
     }
 
     return () => {
@@ -107,108 +120,169 @@ export function AdSlot({ slug, width, height, className = '' }: AdSlotProps) {
     }
   }, [slug, isRotating])
 
-  // Viewport-based impression tracking
+  // Sequential rotation inside fixed container
   useEffect(() => {
-    if (!ad) return
-    
-    // Reset impression tracking for new ads
-    impressionSent.current = false
-    
+    if (!showRotator) return
+
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => {
+        const next = (prev + 1) % visibleAds.length
+        setRotationIndex(slug, next)
+        return next
+      })
+    }, AD_ROTATION_INTERVAL_MS)
+
+    return () => clearInterval(interval)
+  }, [showRotator, visibleAds.length, slug])
+
+  // Keep active index in bounds when ads list changes
+  useEffect(() => {
+    if (activeIndex >= visibleAds.length && visibleAds.length > 0) {
+      setActiveIndex(0)
+    }
+  }, [activeIndex, visibleAds.length])
+
+  // Prefetch next creative
+  useEffect(() => {
+    if (visibleAds.length < 2) return
+    const nextIdx = (activeIndex + 1) % visibleAds.length
+    const next = visibleAds[nextIdx]
+    if (!next?.image_url) return
+    const img = new window.Image()
+    img.src = next.image_url
+  }, [activeIndex, visibleAds])
+
+  // Impression tracking per visible creative
+  useEffect(() => {
+    if (!hasAds) return
     const el = containerRef.current
     if (!el) return
 
     const observer = new IntersectionObserver(
-      entries => {
+      (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting && !impressionSent.current) {
-            impressionSent.current = true
-            observer.disconnect()
+          if (!entry.isIntersecting) continue
+          const ad = visibleAds[activeIndex]
+          if (!ad || impressionSent.current.has(ad.id)) continue
 
-            fetch('/api/ads/impression', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                campaignId: ad.id,
-                slotSlug: slug,
-                sessionId: getSessionId(),
-              }),
-            }).catch(err => console.error('[v0] Failed to track impression:', err))
-          }
+          impressionSent.current.add(ad.id)
+          fetch('/api/ads/impression', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              campaignId: ad.id,
+              slotSlug: slug,
+              sessionId: getSessionId(),
+            }),
+          }).catch((err) => console.error('[AdSlot] Impression failed:', err))
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.5 },
     )
 
     observer.observe(el)
     return () => observer.disconnect()
-  }, [ad, slug])
+  }, [hasAds, visibleAds, activeIndex, slug])
+
+  const handleClick = useCallback(
+    (ad: AdForSlot) => {
+      const now = Date.now()
+      if (now - lastClickTime.current < 1000) return
+      lastClickTime.current = now
+
+      fetch('/api/ads/click', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          campaignId: ad.id,
+          slotSlug: slug,
+          sessionId: getSessionId(),
+        }),
+      }).catch((err) => console.error('[AdSlot] Click failed:', err))
+
+      if (ad.advertiser_url && ad.advertiser_url !== '#') {
+        window.open(ad.advertiser_url, '_blank', 'noopener,noreferrer')
+      }
+    },
+    [slug],
+  )
+
+  const handleImageError = (adId: string) => {
+    setFailedIds((prev) => new Set(prev).add(adId))
+  }
 
   if (loading) {
     return (
       <div
-        style={{ width: '100%', maxWidth: `${adWidth}px`, height: `${adHeight}px` }}
-        className={`bg-muted animate-pulse rounded ${className}`}
+        style={containerStyle}
+        className={cn('ad-slot ad-slot--loading bg-muted/40 animate-pulse rounded', className)}
         aria-hidden="true"
       />
     )
   }
 
-  // Empty state: render nothing (no layout breaking, no error UI for visitors)
-  if (!ad || failed) {
+  if (!hasAds) {
+    if (!reserveSpace) return null
     if (typeof window !== 'undefined' && window.location.search.includes('debug_ads')) {
       return (
-        <div className="border border-dashed border-red-500 p-2 text-[10px] text-red-500 overflow-hidden" style={{ width: adWidth, height: adHeight }}>
-          Slot: {slug}<br/>
-          Reason: {!ad ? 'No ad resolved' : 'Creative failed to load'}
+        <div
+          style={containerStyle}
+          className="ad-slot ad-slot--empty border border-dashed border-red-400 rounded flex items-center justify-center text-[10px] text-red-500"
+        >
+          Empty: {slug}
         </div>
       )
     }
-    return null
+    return (
+      <div
+        style={containerStyle}
+        className={cn('ad-slot ad-slot--empty bg-muted/20 rounded', className)}
+        aria-hidden="true"
+      />
+    )
   }
 
-  function handleClick() {
-    const now = Date.now()
-    if (now - lastClickTime.current < 1000) return
-    lastClickTime.current = now
-
-    fetch('/api/ads/click', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        campaignId: ad!.id,
-        slotSlug: slug,
-        sessionId: getSessionId(),
-      }),
-    }).catch(err => console.error('[v0] Failed to track click:', err))
-
-    if (ad!.advertiser_url && ad!.advertiser_url !== '#') {
-      window.open(ad!.advertiser_url, '_blank', 'noopener,noreferrer')
-    }
-  }
+  const displayAds = showRotator ? visibleAds : [visibleAds[0]]
 
   return (
-    <button
+    <div
       ref={containerRef}
-      onClick={handleClick}
-      type="button"
-      className={`relative block overflow-hidden rounded hover:opacity-90 transition mx-auto ${className}`}
-      style={{ width: '100%', maxWidth: `${adWidth}px`, height: `${adHeight}px` }}
-      title={`${ad.advertiser_name} - ${ad.title}`}
-      aria-label={`Advertisement: ${ad.advertiser_name}`}
+      className={cn('ad-slot ad-slot--rotator mx-auto', className)}
+      style={containerStyle}
+      data-ad-slug={slug}
+      data-ad-count={visibleAds.length}
     >
-      <Image
-        src={ad.image_url}
-        alt={ad.title}
-        fill
-        className="object-contain"
-        sizes={`(max-width: 768px) 100vw, ${adWidth}px`}
-        priority={false}
-        unoptimized
-        onError={() => {
-          console.error(`[v0] Ad failed to load: ${ad.image_url}`)
-          setFailed(true)
-        }}
-      />
-    </button>
+      {displayAds.map((ad, i) => {
+        const isActive = showRotator ? i === activeIndex : true
+        return (
+          <button
+            key={ad.id}
+            type="button"
+            onClick={() => handleClick(ad)}
+            className={cn(
+              'ad-slot__frame block w-full h-full overflow-hidden rounded',
+              'hover:opacity-95 transition-opacity duration-300',
+              showRotator && 'ad-slot__frame--rotating',
+              isActive ? 'ad-slot__frame--active' : 'ad-slot__frame--inactive',
+            )}
+            title={`${ad.advertiser_name} - ${ad.title}`}
+            aria-label={`Advertisement: ${ad.advertiser_name}`}
+            aria-hidden={!isActive}
+            tabIndex={isActive ? 0 : -1}
+          >
+            <Image
+              src={ad.image_url}
+              alt={ad.title}
+              fill
+              className="object-contain"
+              sizes={`(max-width: 768px) 100vw, ${adWidth}px`}
+              priority={i === 0}
+              unoptimized
+              onError={() => handleImageError(ad.id)}
+            />
+          </button>
+        )
+      })}
+    </div>
   )
 }

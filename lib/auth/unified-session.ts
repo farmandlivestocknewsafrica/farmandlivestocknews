@@ -1,12 +1,15 @@
 import { cookies } from 'next/headers'
-import { jwtVerify, SignJWT } from 'jose'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import type { AuthUser, AuthSession } from './auth-context'
-
-const SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key-change-in-production')
-const ALGORITHM = 'HS256'
-const AUTH_COOKIE = 'auth_session' // Shared across both public site and CMS
-const SESSION_DURATION = 3650 * 24 * 60 * 60 // 10 years in seconds
+import {
+  AUTH_COOKIE,
+  createToken,
+  getSessionTokenFromCookies,
+  getUserIdFromPayload,
+  SESSION_DURATION,
+  verifyToken,
+} from './token'
+import { SESSION_COOKIE_OPTIONS } from './cookie-config'
 
 export interface SessionPayload {
   userId: string
@@ -16,83 +19,149 @@ export interface SessionPayload {
   exp?: number
 }
 
+function parseUserAgent(userAgent: string | null): { deviceName: string; browser: string } {
+  const ua = userAgent || 'Unknown'
+  let browser = 'Unknown'
+
+  if (ua.includes('Firefox')) browser = 'Firefox'
+  else if (ua.includes('Edg/')) browser = 'Edge'
+  else if (ua.includes('Chrome')) browser = 'Chrome'
+  else if (ua.includes('Safari')) browser = 'Safari'
+
+  const deviceName = /Mobile|Android|iPhone/i.test(ua) ? 'Mobile' : 'Desktop'
+  return { deviceName, browser }
+}
+
 /**
- * Create and store a new JWT session token
+ * Create and store a new JWT session token with DB tracking.
  */
-export async function createAuthSession(user: AuthUser): Promise<string> {
-  const token = await new SignJWT({
+export async function createAuthSession(
+  user: AuthUser,
+  metadata?: { userAgent?: string | null; ipAddress?: string | null },
+): Promise<string> {
+  const token = await createToken({
     userId: user.id,
     email: user.email,
-    role: user.role
+    role: user.role,
   })
-    .setProtectedHeader({ alg: ALGORITHM })
-    .setIssuedAt()
-    .setExpirationTime('3650d')
-    .sign(SECRET)
 
-  // Store session token in database for multi-device tracking
-  const supabase = await createClient()
+  const supabase = await createAdminClient()
   const expiresAt = new Date(Date.now() + SESSION_DURATION * 1000)
-  
-  await supabase
-    .from('admin_sessions')
-    .insert({
-      admin_id: user.id,
-      session_token: token,
-      device_name: 'Browser', // Can be enhanced with device detection
-      browser: 'Unknown',
-      expires_at: expiresAt.toISOString(),
-      is_active: true
-    })
+  const { deviceName, browser } = parseUserAgent(metadata?.userAgent ?? null)
+
+  await supabase.from('admin_sessions').insert({
+    admin_id: user.id,
+    session_token: token,
+    device_name: deviceName,
+    browser,
+    ip_address: metadata?.ipAddress || 'unknown',
+    expires_at: expiresAt.toISOString(),
+    is_active: true,
+    last_activity_at: new Date().toISOString(),
+  })
 
   return token
 }
 
 /**
- * Verify JWT token
+ * Ensure a legacy JWT without a DB record gets migrated into admin_sessions.
  */
-export async function verifyAuthToken(token: string): Promise<SessionPayload | null> {
-  try {
-    const verified = await jwtVerify(token, SECRET)
-    return verified.payload as SessionPayload
-  } catch (error) {
-    console.error('[v0] Token verification failed:', error)
+async function ensureSessionRecord(
+  token: string,
+  userId: string,
+  metadata?: { userAgent?: string | null; ipAddress?: string | null },
+): Promise<string | null> {
+  const supabase = await createAdminClient()
+
+  const { data: existing } = await supabase
+    .from('admin_sessions')
+    .select('id')
+    .eq('session_token', token)
+    .eq('is_active', true)
+    .maybeSingle()
+
+  if (existing?.id) return existing.id
+
+  const expiresAt = new Date(Date.now() + SESSION_DURATION * 1000)
+  const { deviceName, browser } = parseUserAgent(metadata?.userAgent ?? null)
+
+  const { data: created, error } = await supabase
+    .from('admin_sessions')
+    .insert({
+      admin_id: userId,
+      session_token: token,
+      device_name: deviceName,
+      browser,
+      ip_address: metadata?.ipAddress || 'unknown',
+      expires_at: expiresAt.toISOString(),
+      is_active: true,
+      last_activity_at: new Date().toISOString(),
+    })
+    .select('id')
+    .single()
+
+  if (error || !created) {
+    console.error('[auth] Failed to migrate session record:', error)
     return null
   }
+
+  return created.id
 }
 
 /**
- * Get current authenticated session from cookies
- * Works across both public site and CMS
+ * Get current authenticated session from cookies.
+ * Reads auth_session and legacy admin_session cookies.
  */
 export async function getCurrentSession(): Promise<AuthSession | null> {
   const cookieStore = await cookies()
-  const token = cookieStore.get(AUTH_COOKIE)?.value
+  const token = getSessionTokenFromCookies(cookieStore)
 
   if (!token) return null
 
-  const payload = await verifyAuthToken(token)
+  const payload = await verifyToken(token)
   if (!payload) return null
 
-  // Fetch full user data from database
-  const supabase = await createClient()
+  const userId = getUserIdFromPayload(payload)
+  if (!userId) return null
+
+  const supabase = await createAdminClient()
   const { data: user, error } = await supabase
     .from('admin_accounts')
     .select('*')
-    .eq('id', payload.userId)
+    .eq('id', userId)
     .single()
 
-  if (error || !user) return null
+  if (error || !user || !user.is_active) return null
 
-  // Check if session is still active in database
-  const { data: sessionData } = await supabase
+  let { data: sessionData } = await supabase
     .from('admin_sessions')
     .select('*')
     .eq('session_token', token)
     .eq('is_active', true)
-    .single()
+    .maybeSingle()
+
+  if (!sessionData) {
+    const sessionId = await ensureSessionRecord(token, userId)
+    if (!sessionId) return null
+
+    const { data: migrated } = await supabase
+      .from('admin_sessions')
+      .select('*')
+      .eq('id', sessionId)
+      .single()
+
+    sessionData = migrated
+  }
 
   if (!sessionData) return null
+
+  if (new Date(sessionData.expires_at) < new Date()) {
+    await supabase
+      .from('admin_sessions')
+      .update({ is_active: false })
+      .eq('id', sessionData.id)
+    return null
+  }
 
   return {
     user: {
@@ -104,91 +173,74 @@ export async function getCurrentSession(): Promise<AuthSession | null> {
       is_active: user.is_active,
       email_verified: user.email_verified,
       created_at: user.created_at,
-      last_login_at: user.last_login_at
+      last_login_at: user.last_login_at,
     },
     sessionId: sessionData.id,
-    expiresAt: new Date(sessionData.expires_at)
+    expiresAt: new Date(sessionData.expires_at),
   }
 }
 
-/**
- * Set authenticated session cookie
- * Shared across both public site and CMS
- */
 export async function setAuthCookie(token: string): Promise<void> {
   const cookieStore = await cookies()
-  cookieStore.set(AUTH_COOKIE, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: SESSION_DURATION,
-    path: '/' // Shared across entire domain
-  })
+  cookieStore.set(AUTH_COOKIE, token, SESSION_COOKIE_OPTIONS)
+  cookieStore.set('admin_session', token, SESSION_COOKIE_OPTIONS)
 }
 
-/**
- * Clear authentication cookie
- */
 export async function clearAuthCookie(): Promise<void> {
   const cookieStore = await cookies()
   cookieStore.delete(AUTH_COOKIE)
+  cookieStore.delete('admin_session')
 }
 
-/**
- * Logout from all devices
- */
+export async function logoutOtherSessions(userId: string, currentSessionId: string): Promise<void> {
+  const supabase = await createAdminClient()
+
+  await supabase
+    .from('admin_sessions')
+    .update({ is_active: false })
+    .eq('admin_id', userId)
+    .neq('id', currentSessionId)
+}
+
 export async function logoutAllSessions(userId: string): Promise<void> {
-  const supabase = await createClient()
-  
-  // Mark all sessions as inactive
+  const supabase = await createAdminClient()
+
   await supabase
     .from('admin_sessions')
     .update({ is_active: false })
     .eq('admin_id', userId)
 
-  // Clear current session cookie
   await clearAuthCookie()
 }
 
-/**
- * Logout from current device
- */
 export async function logoutCurrentSession(): Promise<void> {
   const cookieStore = await cookies()
-  const token = cookieStore.get(AUTH_COOKIE)?.value
+  const token = getSessionTokenFromCookies(cookieStore)
 
   if (!token) return
 
-  const supabase = await createClient()
-  
-  // Mark this session as inactive
+  const supabase = await createAdminClient()
+
   await supabase
     .from('admin_sessions')
     .update({ is_active: false })
     .eq('session_token', token)
 
-  // Clear session cookie
   await clearAuthCookie()
 }
 
-/**
- * Update last activity timestamp for session
- */
 export async function updateSessionActivity(sessionId: string): Promise<void> {
-  const supabase = await createClient()
-  
+  const supabase = await createAdminClient()
+
   await supabase
     .from('admin_sessions')
     .update({ last_activity_at: new Date().toISOString() })
     .eq('id', sessionId)
 }
 
-/**
- * Get all active sessions for user
- */
 export async function getUserSessions(userId: string) {
-  const supabase = await createClient()
-  
+  const supabase = await createAdminClient()
+
   const { data: sessions } = await supabase
     .from('admin_sessions')
     .select('*')
@@ -198,3 +250,6 @@ export async function getUserSessions(userId: string) {
 
   return sessions || []
 }
+
+// Re-export token helpers for middleware and legacy callers
+export { verifyToken as verifyAuthToken } from './token'

@@ -1,8 +1,7 @@
-import { Header } from '@/components/header'
-import { Footer } from '@/components/footer'
+import { SiteShell } from '@/components/site-shell'
 import { ArticleCard } from '@/components/article-card'
 import { InfiniteArticles } from '@/components/infinite-articles'
-import { AdSlot } from '@/components/ad-slot'
+import { AdPlacement, MobileInlineAd } from '@/components/ad-placement'
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 
@@ -76,7 +75,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <main className="flex-1 relative">
         {/* HOME TOP ROTATING LEADERBOARD - below header */}
         <div className="w-full py-3 flex justify-center px-4 bg-muted/20">
-          <AdSlot slug="HOME_LEADERBOARD_PRIMARY" />
+          <AdPlacement slug="HOME_LEADERBOARD_PRIMARY" variant="leaderboard" />
         </div>
 
         <div className="w-full px-4 py-12">
@@ -127,7 +126,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
         {/* Infinite Scroll Articles */}
         {articles.length > 0 ? (
-          <div className="flex gap-6 relative">
+          <div className="flex gap-10 xl:gap-14 2xl:gap-20 items-start relative">
             <div className="flex-1 min-w-0">
               <h2 className="font-serif text-2xl font-bold text-primary mb-6">All Articles</h2>
               <InfiniteArticles 
@@ -146,23 +145,20 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
         {/* IN-CONTENT NATIVE BANNER */}
         <div className="w-full py-3 flex justify-center px-4">
-          <AdSlot slug="IN_CONTENT_NATIVE" />
+          <AdPlacement slug="IN_CONTENT_NATIVE" variant="native" />
         </div>
 
         {/* BOTTOM LEADERBOARD */}
         <div className="w-full py-3 flex justify-center px-4">
-          <AdSlot slug="BOTTOM_LEADERBOARD" />
+          <AdPlacement slug="BOTTOM_LEADERBOARD" variant="leaderboard" />
         </div>
 
         {/* BOTTOM ROTATING LEADERBOARD */}
         <div className="w-full py-3 flex justify-center px-4">
-          <AdSlot slug="BOTTOM_ROTATOR" />
+          <AdPlacement slug="BOTTOM_ROTATOR" variant="leaderboard" />
         </div>
 
-        {/* MOBILE STICKY AD */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 w-full py-2 flex justify-center px-2 bg-background border-t border-border z-40">
-          <AdSlot slug="MOBILE_STICKY" width={320} height={50} />
-        </div>
+        <MobileInlineAd />
       </main>
     </SiteShell>
   )

@@ -1,6 +1,6 @@
 import { SiteShell } from '@/components/site-shell'
 import { ArticleCard } from '@/components/article-card'
-import { AdSlot } from '@/components/ad-slot'
+import { AdPlacement, MobileInlineAd } from '@/components/ad-placement'
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
@@ -93,7 +93,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
           {/* TOP ARTICLE AD */}
           <div className="w-full py-2 flex justify-center mb-6">
-            <AdSlot slug="ARTICLE_TOP" />
+            <AdPlacement slug="ARTICLE_TOP" variant="leaderboard" />
           </div>
         </div>
 
@@ -126,7 +126,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                   <p className="text-foreground leading-relaxed mb-4">{part}</p>
                   {idx === Math.floor(contentParts.length / 2) - 1 && contentParts.length > 2 && (
                     <div className="w-full py-4 flex justify-center not-prose">
-                      <AdSlot slug="ARTICLE_MIDDLE" />
+                      <AdPlacement slug="ARTICLE_MIDDLE" variant="native" />
                     </div>
                   )}
                 </div>
@@ -178,21 +178,18 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
         {/* Bottom article slots */}
         <div className="w-full py-4 flex justify-center">
-          <AdSlot slug="ARTICLE_BOTTOM" />
+          <AdPlacement slug="ARTICLE_BOTTOM" variant="leaderboard" />
         </div>
 
         <div className="w-full py-4 flex justify-center">
-          <AdSlot slug="BOTTOM_LEADERBOARD" />
+          <AdPlacement slug="BOTTOM_LEADERBOARD" variant="leaderboard" />
         </div>
 
         <div className="w-full py-4 flex justify-center">
-          <AdSlot slug="BOTTOM_ROTATOR" />
+          <AdPlacement slug="BOTTOM_ROTATOR" variant="leaderboard" />
         </div>
-      </div>
 
-      {/* MOBILE STICKY AD */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 w-full py-2 flex justify-center px-2 bg-background border-t border-border z-40">
-        <AdSlot slug="MOBILE_STICKY" width={320} height={50} />
+        <MobileInlineAd />
       </div>
     </SiteShell>
   )

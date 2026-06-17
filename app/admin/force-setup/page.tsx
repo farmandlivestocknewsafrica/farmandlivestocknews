@@ -99,7 +99,6 @@ export default function ForceSetup() {
       }
 
       setStep('complete')
-      localStorage.removeItem('admin_session')
       setTimeout(() => {
         window.location.href = '/admin/login'
       }, 3000)

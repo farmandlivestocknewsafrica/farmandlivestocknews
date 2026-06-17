@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentSession, logoutAllSessions } from '@/lib/auth/unified-session'
 import { createClient } from '@/lib/supabase/server'
 import { verifyPassword, hashPassword } from '@/lib/auth/password'
+import { clearSessionCookies } from '@/lib/auth/cookie-config'
 
 export async function POST(req: NextRequest) {
   try {
@@ -69,10 +70,12 @@ export async function POST(req: NextRequest) {
     // Logout all sessions on password change for security
     await logoutAllSessions(session.user.id)
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       { message: 'Password changed successfully. Please log in again.' },
-      { status: 200 }
+      { status: 200 },
     )
+    clearSessionCookies(response)
+    return response
   } catch (error) {
     console.error('[v0] Error:', error)
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 })
