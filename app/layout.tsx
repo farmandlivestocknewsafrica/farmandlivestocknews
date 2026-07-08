@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   title: 'Farm & Livestock News Africa',
   description: 'Independent agriculture reporting for farmers, agribusinesses and policy makers across Africa',
   generator: 'v0.app',
+  verification:{
+    google:"l6NgnJmY35HPVVm0q6oMsDrIaGKP4R1KzJAufGM2I4I",
+  },
   icons: {
     icon: [
       {
