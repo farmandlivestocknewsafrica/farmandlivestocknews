@@ -38,18 +38,6 @@ const NAVIGATION_CATEGORIES = [
     name: 'Nutrition',
     slug: 'inputs-nutrition',
     key: 'nutrition'
-  },
-  {
-    id: 'policy_regulations',
-    name: 'Policy & Regulations',
-    slug: 'policy-regulations',
-    key: 'policy_regulations'
-  },
-  {
-    id: 'veterinary_protection',
-    name: 'Veterinary & Protection',
-    slug: 'veterinary-protection',
-    key: 'veterinary_protection'
   }
 ]
 
