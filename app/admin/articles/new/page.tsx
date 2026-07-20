@@ -59,8 +59,6 @@ export default function NewArticlePage() {
     { key: 'technology_innovation', label: 'Technology & Innovation' },
     { key: 'equipment_mechanisation', label: 'Equipment & Mechanisation' },
     { key: 'nutrition', label: 'Nutrition' },
-    { key: 'policy_regulations', label: 'Policy & Regulations' },
-    { key: 'veterinary_protection', label: 'Veterinary & Protection' }
   ]
 
   function generateSlug(text: string) {
