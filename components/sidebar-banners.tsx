@@ -13,7 +13,7 @@ export function SidebarBanners({ side }: { side: 'left' | 'right' }) {
         side === 'left' ? 'border-r border-border/30' : 'border-l border-border/30',
       )}
     >
-      <div className="sticky top-24 space-y-6 px-3 pt-2">
+      <div className="sticky top-24 space-y-4 px-3 pt-2">
         {[1, 2, 3, 4, 5, 6, 7].map((i) => (
           <AdPlacement
             key={`${prefix}_${i}`}
