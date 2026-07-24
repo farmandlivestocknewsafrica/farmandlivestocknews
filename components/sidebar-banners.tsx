@@ -18,8 +18,8 @@ export function SidebarBanners({ side }: { side: 'left' | 'right' }) {
           <AdPlacement
             key={`${prefix}_${i}`}
             slug={`${prefix}_${i}`}
-            width={280}
-            height={900}
+            width={300}
+            height={600}
             variant="sidebar"
           />
         ))}
