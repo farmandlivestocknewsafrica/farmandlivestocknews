@@ -9,12 +9,18 @@ interface HomePageClientProps {
   featured: any
   articles: any[]
   trending: TrendingArticle[]
+  totalArticles: number
+  articlesPerPage: number
+  currentPage: number
 }
 
 export function HomePageClient({
   featured,
   articles,
-  trending
+  trending,
+  totalArticles,
+  articlesPerPage,
+  currentPage  
 }: HomePageClientProps) {
   // Pre-build article feed with inline ads interleaved
   const feedItems: React.ReactNode[] = []
@@ -142,7 +148,27 @@ export function HomePageClient({
         <FeedLayout layout="grid" spacing="normal">
           {feedItems}
         </FeedLayout>
-      </section>
+
+        <div className="flex justify-center items-center gap-4 mt-8">
+{currentPage > 1 && (
+<a
+href={`/?page=${currentPage - 1}`}
+className="px-5 py-2 border border-border rounded-lg hover:bg-muted transition"
+>
+← Previous
+</a>
+)}
+
+{currentPage * articlesPerPage < totalArticles && (
+<a
+href={`/?page=${currentPage + 1}`}
+className="px-5 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition"
+>
+Next →
+</a>
+)}
+    </div>
+    </section>
     </div>
   )
 }
