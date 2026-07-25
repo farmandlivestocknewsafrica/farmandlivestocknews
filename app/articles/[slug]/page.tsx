@@ -22,6 +22,13 @@ async function getArticleData(slug: string) {
     if (!articleRes.data) {
       return null
     }
+    await supabase
+      .from('articles')
+      .update({
+        view_count: (articleRes.data.view_count || 0) + 1
+      })
+      .eq('id', articleRes.data.id)
+    articleRes.data.view_count = (articleRes.data.view_count || 0) + 1
 
     const relatedRes = await supabase
       .from('articles')
