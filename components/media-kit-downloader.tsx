@@ -44,6 +44,10 @@ export function MediaKitDownloader() {
       link.click()
       document.body.removeChild(link)
       console.log('[MediaKit] Download triggered')
+      // Increase the download count
+      await fetch(`/api/media-kits/${kit.id}/download`, {
+        method: 'POST'
+      })
     } catch (err) {
       console.error('[MediaKit] Download error:', err)
       alert(`Failed to download media kit: ${err instanceof Error ? err.message : 'Unknown error'}`)
