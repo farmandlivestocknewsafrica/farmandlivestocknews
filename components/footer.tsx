@@ -187,7 +187,6 @@ export function Footer() {
           {/* Bottom Bar */}
           <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white/60">
             <p>© 2026 Farm & Livestock News Africa. All rights reserved.</p>
-            <p className="text-xs text-white/50">Designed by Joshua Muhali &mdash; 0974399695</p>
           </div>
         </div>
       </div>
