@@ -3,52 +3,53 @@ import { Lora, Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from '@/components/ui/sonner'
 import { AuthProvider } from '@/app/providers/AuthProvider'
+import { CookieBanner } from '@/components/cookie-banner'
 import './globals.css'
 
 const lora = Lora({ subsets: ["latin"], variable: '--font-lora' })
 const inter = Inter({ subsets: ["latin"], variable: '--font-inter' })
 
 export const metadata: Metadata = {
-  title: 'Farm & Livestock News Africa',
-  description: 'Independent agriculture reporting for farmers, agribusinesses and policy makers across Africa',
-  generator: 'v0.app',
-  verification:{
-    google:"l6NgnJmY35HPVVm0q6oMsDrIaGKP4R1KzJAufGM2I4I",
-  },
-  icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png?v=999&cb=1721836800000',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png?v=999&cb=1721836800000',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg?v=999&cb=1721836800000',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/apple-icon.png?v=999&cb=1721836800000',
-  },
+title: 'Farm & Livestock News Africa',
+description: 'Independent agriculture reporting for farmers, agribusinesses and policy makers across Africa',
+generator: 'v0.app',
+verification: {
+google: "l6NgnJmY35HPVVm0q6oMsDrIaGKP4R1KzJAufGM2I4I",
+},
+icons: {
+icon: [
+{
+url: '/icon-light-32x32.png?v=999&cb=1721836800000',
+media: '(prefers-color-scheme: light)',
+},
+{
+url: '/icon-dark-32x32.png?v=999&cb=1721836800000',
+media: '(prefers-color-scheme: dark)',
+},
+{
+url: '/icon.svg?v=999&cb=1721836800000',
+type: 'image/svg+xml',
+},
+],
+apple: '/apple-icon.png?v=999&cb=1721836800000',
+},
 }
 
 export default async function RootLayout({
-  children,
+children,
 }: Readonly<{
-  children: React.ReactNode
+children: React.ReactNode
 }>) {
-  return (
-    <html lang="en" className={`${lora.variable} ${inter.variable}`}>
-      <body className="font-sans antialiased bg-background text-foreground">
-        <AuthProvider>
-          {children}
-        </AuthProvider>
-        <Toaster position="top-right" richColors />
-        {process.env.NODE_ENV === 'production' && <Analytics />}
-      </body>
-    </html>
-  )
+return (
+<html lang="en" className={`${lora.variable} ${inter.variable}`}>
+<body className="font-sans antialiased bg-background text-foreground">
+<AuthProvider>
+{children}
+</AuthProvider>
+<Toaster position="top-right" richColors />
+{process.env.NODE_ENV === 'production' && <Analytics />}
+<CookieBanner />
+</body>
+</html>
+)
 }
-
