@@ -5,91 +5,142 @@ import { createClient } from '@/lib/supabase/server'
 import { getTrendingArticles } from '@/lib/trending'
 
 async function getHomepageData(page: number) {
-const supabase = await createClient()
+ const supabase = await createClient()
 
-const ARTICLES_PER_PAGE = 20
-const from = (page - 1) * ARTICLES_PER_PAGE
-const to = from + ARTICLES_PER_PAGE - 1
+ const ARTICLES_PER_PAGE = 20
+ const from = (page - 1) * ARTICLES_PER_PAGE
+ const to = from + ARTICLES_PER_PAGE - 1
 
-try {
-const [featuredRes, articlesRes, trending] = await Promise.all([
-supabase
-.from('articles')
-.select('*')
-.eq('is_featured', true)
-.order('published_at', { ascending: false })
-.limit(1),
-supabase
-.from('articles')
-.select('*', { count: 'exact' })
-.order('published_at', { ascending: false })
-.range(from, to),
+ try {
+ const [featuredRes, articlesRes, trending] = await Promise.all([
+ supabase
+ .from('articles')
+ .select('*')
+ .eq('is_featured', true)
+ .order('published_at', { ascending: false })
+ .limit(1),
 
-getTrendingArticles()
-])
+ supabase
+ .from('articles')
+ .select('*', { count: 'exact' })
+ .order('published_at', { ascending: false })
+ .range(from, to),
 
-return {
-featured: featuredRes.data?.[0] || null,
-articles: articlesRes.data || [],
-totalArticles: articlesRes.count || 0,
-articlesPerPage: ARTICLES_PER_PAGE,
-trending
-}
-} catch (error) {
-console.error('Error fetching homepage data:', error)
-return {
-featured: null,
-articles: [],
-trending: []
-}
-}
+ getTrendingArticles(),
+ ])
+
+ // IMPORTANT:
+ // Supabase can return query errors without throwing an exception.
+ if (featuredRes.error) {
+ console.error(
+ '[Homepage] Featured articles query failed:',
+ featuredRes.error,
+ )
+ }
+
+ if (articlesRes.error) {
+ console.error(
+ '[Homepage] Articles query failed:',
+ articlesRes.error,
+ )
+ }
+
+ if (featuredRes.error || articlesRes.error) {
+ return {
+ featured: null,
+ articles: [],
+ totalArticles: 0,
+ articlesPerPage: ARTICLES_PER_PAGE,
+ trending: [],
+ }
+ }
+
+ return {
+ featured: featuredRes.data?.[0] || null,
+ articles: articlesRes.data || [],
+ totalArticles: articlesRes.count || 0,
+ articlesPerPage: ARTICLES_PER_PAGE,
+ trending,
+ }
+ } catch (error) {
+ console.error('[Homepage] Error fetching homepage data:', error)
+
+ return {
+ featured: null,
+ articles: [],
+ totalArticles: 0,
+ articlesPerPage: ARTICLES_PER_PAGE,
+ trending: [],
+ }
+ }
 }
 
 interface HomeProps {
-searchParams: Promise<{ page?: string }>
+ searchParams: Promise<{ page?: string }>
 }
 
 export default async function Home({ searchParams }: HomeProps) {
-const params = await searchParams
-const page = Number(params.page || '1')
+ const params = await searchParams
 
-const {
-featured,
-articles,
-trending,
-totalArticles,
-articlesPerPage
-} = await getHomepageData(page)
+ const requestedPage = Number(params.page || '1')
+ const page =
+ Number.isFinite(requestedPage) && requestedPage > 0
+ ? Math.floor(requestedPage)
+ : 1
 
-return (
-<SiteShell>
-{/* Home Page Leaderboard Primary - reduced spacing */}
-<div className="home-page-leaderboard w-full flex justify-center py-2">
-<AdPlacement slug="HOME_LEADERBOARD_PRIMARY" variant="leaderboard" />
-</div>
+ const {
+ featured,
+ articles,
+ trending,
+ totalArticles,
+ articlesPerPage,
+ } = await getHomepageData(page)
 
-<div className="w-full flex justify-center py-2">
-<AdPlacement slug="HOME_LEADERBOARD_SECONDARY" variant="leaderboard" />
-</div>
+ return (
+ <SiteShell>
+ {/* Home Page Leaderboard Primary */}
+ <div className="home-page-leaderboard w-full flex justify-center py-2">
+ <AdPlacement
+ slug="HOME_LEADERBOARD_PRIMARY"
+ variant="leaderboard"
+ />
+ </div>
 
-<HomePageClient
-featured={featured}
-articles={articles}
-trending={trending}
-totalArticles={totalArticles}
-articlesPerPage={articlesPerPage}
-currentPage={page}
-/>
+ {/* Home Page Leaderboard Secondary */}
+ <div className="w-full flex justify-center py-2">
+ <AdPlacement
+ slug="HOME_LEADERBOARD_SECONDARY"
+ variant="leaderboard"
+ />
+ </div>
 
-<div className="w-full py-4 flex justify-center">
-<AdPlacement slug="BOTTOM_LEADERBOARD" variant="leaderboard" />
-</div>
+ <HomePageClient
+ featured={featured}
+ articles={articles}
+ trending={trending}
+ totalArticles={totalArticles}
+ articlesPerPage={articlesPerPage}
+ currentPage={page}
+ />
 
-<div className="w-full py-4 flex justify-center">
-<AdPlacement slug="BOTTOM_ROTATOR" variant="leaderboard" />
-</div>
+ {/* Bottom Leaderboard */}
+ <div className="w-full py-4 flex justify-center">
+ <AdPlacement
+ slug="BOTTOM_LEADERBOARD"
+ variant="leaderboard"
+ />
+ </div>
 
-<MobileInlineAd />
-</SiteShell>
-)
+ {/* Bottom Rotator */}
+ <div className="w-full py-4 flex justify-center">
+ <AdPlacement
+ slug="BOTTOM_ROTATOR"
+ variant="leaderboard"
+ />
+ </div>
+
+ {/* Mobile Inline Advertisement */}
+ <MobileInlineAd />
+ </SiteShell>
+ )
 }
