@@ -1,87 +1,101 @@
+
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
-interface ArticlesQuery {
-  category?: string
-  limit?: number
-  cursor?: string
-}
+const VALID_CATEGORIES = [
+  'agribusiness',
+  'crop_production',
+  'livestock_farming',
+  'technology_innovation',
+  'equipment_mechanisation',
+  'nutrition',
+  'policy_regulations',
+  'veterinary_protection',
+] as const
 
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
     const searchParams = request.nextUrl.searchParams
-    
+
     const category = searchParams.get('category')
-    const limit = Math.min(parseInt(searchParams.get('limit') || '12'), 50)
-    const cursor = searchParams.get('cursor') // published_at timestamp for cursor
+    const rawPage = Number(searchParams.get('page') || '1')
+    const rawLimit = Number(searchParams.get('limit') || '20')
+
+    if (
+      !Number.isSafeInteger(rawPage) ||
+      rawPage < 1 ||
+      !Number.isSafeInteger(rawLimit) ||
+      rawLimit < 1
+    ) {
+      return NextResponse.json(
+        { error: 'Page and limit must be positive whole numbers.' },
+        { status: 400 }
+      )
+    }
+
+    if (
+      category &&
+      !VALID_CATEGORIES.includes(
+        category as (typeof VALID_CATEGORIES)[number]
+      )
+    ) {
+      return NextResponse.json(
+        { error: 'Invalid category.' },
+        { status: 400 }
+      )
+    }
+
+    const page = rawPage
+    const limit = Math.min(rawLimit, 50)
+    const from = (page - 1) * limit
+    const to = from + limit - 1
 
     let query = supabase
       .from('articles')
       .select('*', { count: 'exact' })
-      .order('published_at', { ascending: false })
-      .limit(limit + 1)
+      .order('published_at', { ascending: false, nullsFirst: false })
+      .order('id', { ascending: false })
+      .range(from, to)
 
     if (category) {
-      const validCategories = [
-        'crop_production',
-        'livestock_farming',
-        'technology_innovation',
-        'equipment_mechanisation',
-        'nutrition',
-        'agribusiness'
-      ]
-      
-      if (!validCategories.includes(category)) {
-        return NextResponse.json(
-          { error: 'Invalid category' },
-          { status: 400 }
-        )
-      }
-      
       query = query.eq('category', category)
-    }
-
-    // Cursor-based pagination: if cursor provided, fetch articles published before that timestamp
-    if (cursor) {
-      try {
-        query = query.lt('published_at', new Date(cursor).toISOString())
-      } catch (e) {
-        return NextResponse.json(
-          { error: 'Invalid cursor format' },
-          { status: 400 }
-        )
-      }
     }
 
     const { data, error, count } = await query
 
     if (error) {
-      console.error('[v0] Articles fetch error:', error)
+      console.error('Articles fetch error:', error)
+
       return NextResponse.json(
-        { error: 'Failed to fetch articles' },
+        { error: 'Failed to fetch articles from the database.' },
         { status: 500 }
       )
     }
 
-    const hasMore = data && data.length > limit
-    const articles = hasMore ? data.slice(0, limit) : data || []
+    const total = count ?? 0
+    const totalPages = Math.ceil(total / limit)
 
-    // nextCursor is the published_at of the last article (for fetching older articles)
-    const nextCursor = hasMore && articles.length > 0
-      ? articles[articles.length - 1].published_at
-      : null
-
-    return NextResponse.json({
-      articles,
-      nextCursor,
-      hasMore,
-      total: !cursor ? count : undefined // Only return total on first request
-    })
-  } catch (error) {
-    console.error('[v0] Articles API error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      {
+        articles: data ?? [],
+        page,
+        limit,
+        total,
+        totalPages,
+        hasMore: page < totalPages,
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store',
+        },
+      }
+    )
+  } catch (error) {
+    console.error('Articles API error:', error)
+
+    return NextResponse.json(
+      { error: 'Internal server error.' },
       { status: 500 }
     )
   }
